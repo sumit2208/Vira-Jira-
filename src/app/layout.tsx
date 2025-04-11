@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  ClerkProvider,
+  SignedIn,
+  SignedOut,
+  SignIn,
+} from "@clerk/nextjs";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -27,16 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <div className="h-full">
-          {/* <Navbar /> */}
-          <Hero/>
-          </div> 
-            
-          {children}
+      <html lang="en" className={inter.variable}>
+        <body className="font-sans antialiased">
+          <header className="flex justify-center items-center h-screen">
+            <SignedOut>
+              <SignIn routing="hash" />
+            </SignedOut>
+          </header>
+          <SignedIn>{children}</SignedIn>
         </body>
       </html>
     </ClerkProvider>

@@ -1,28 +1,22 @@
-import React from "react";
+"use client";
+
 import {
+  SignIn,
   SignInButton,
   SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+
 const Navbar = () => {
   return (
-    <div className="flex h-full justify-between items-center">
-      <ul
-        className="flex p-5 gap-4  w-full"
-        style={{ backgroundColor: "#182130" }}
-      >
-        <li>Home</li>
-        <li>About</li>
-        <li>Contact</li>
-        <li>Home</li>
-      </ul>
+    <div className="flex justify-between items-center px-8 py-4 shadow-sm fixed w-full left-64 bg-white z-10">
+      <h2 className="text-lg font-semibold">Dashboard Overview</h2>
       <div>
-        <SignedOut>
-          <SignInButton />
-          <SignUpButton />
-        </SignedOut>
+        <SignedOut> 
+                    <SignIn routing="hash"/>
+                </SignedOut>
         <SignedIn>
           <UserButton />
         </SignedIn>

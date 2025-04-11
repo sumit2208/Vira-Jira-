@@ -1,21 +1,15 @@
-"use client";
+"use client"
+import React from "react";
+import Sidebar from "@/components/Sidebar";
+// import Navbar from "@/components/Navbar"; 
 
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import Hero from "@/components/Hero"; 
-
-const HomePage = () => {
+const Page = () => {
   return (
     <>
-      <SignedOut>
-        {/* Unauthenticated view */}
-        <Hero />
-      </SignedOut>
-
-      <SignedIn>
-        {/* Authenticated view */} 
-      </SignedIn>
+      <Sidebar />
+      {/* <Navbar />  */}
     </>
   );
 };
 
-export default HomePage;
+export default Page;
