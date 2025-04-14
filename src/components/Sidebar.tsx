@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { SignedIn, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
+
 import {
   Home,
   FolderOpen,
@@ -34,13 +36,15 @@ const Sidebar = () => {
       >
         <div>
           <div className="flex justify-between items-center mb-6">
-            <h1 className= {`text-xl font-bold  ${isOpen? "ml-10":""}  `}>Vira</h1>
+            <h1 className={`text-xl font-bold  ${isOpen ? "ml-10" : ""}  `}>
+              Vira
+            </h1>
             <SignedIn>
               <UserButton />
             </SignedIn>
           </div>
 
-            <div className="border-1 border-b-black mb-5  "></div>
+          <div className="border-1 border-b-black mb-5  "></div>
 
           <ul className="space-y-4">
             <li className="flex items-center gap-3 cursor-pointer hover:text-gray-500">
@@ -49,9 +53,15 @@ const Sidebar = () => {
             <li className="flex items-center gap-3 cursor-pointer hover:text-gray-500">
               <FolderOpen size={18} /> Projects
             </li>
-            <li className="flex items-center gap-3 cursor-pointer hover:text-gray-500">
-              <FlagTriangleRight size={18} /> Issues
-            </li>
+           
+              <Link
+                href="/issuepage"
+                className="flex items-center gap-3 cursor-pointer hover:text-gray-500"
+              >
+                <FlagTriangleRight size={18} /> Issues
+              </Link>
+           
+
             <li className="flex items-center gap-3 cursor-pointer hover:text-gray-500">
               <BarChartBig size={18} /> Reports
             </li>
