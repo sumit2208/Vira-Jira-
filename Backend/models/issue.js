@@ -7,7 +7,10 @@ const issueSchema = new mongoose.Schema({
     enum: ["High", "Medium", "Low"],
     default: "Medium"
   },
+  project:String,
   assignee: String,
+  description:String,
+    date:Date,
   type: {
     type: String,
     enum: ["bug", "code", "doc"],

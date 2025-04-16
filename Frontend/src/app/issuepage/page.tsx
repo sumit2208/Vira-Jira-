@@ -18,10 +18,8 @@ import {
 } from "@mui/joy";
 import Link from "next/link";
 import React, { useState } from "react";
-import {
-  Search,
-  Filter,
-  MoreVertical,
+import { 
+  Filter, 
   Bug,
   FileCode,
   FileText, 
@@ -34,7 +32,10 @@ interface Issue {
   title: string;
   priority: "High" | "Medium" | "Low";
   assignee: string;
+  project:String,
   type: "bug" | "code" | "doc";
+  description?:String
+  date?:Date
 }
 
 type PriorityColor = "danger" | "warning" | "success" | "neutral";
@@ -107,7 +108,7 @@ const IssuePage = () => {
           mb: 3,
         }}
       >
-        <Typography level="h4" component="h1">
+        <Typography level="h1" component="h1">
           Issues
         </Typography>
         <Link href="/issuepage/create" passHref>
@@ -245,6 +246,7 @@ const IssuePage = () => {
               <th style={{ width: "80px" }}>ID</th>
               <th>Title</th>
               <th style={{ width: "100px" }}>Priority</th> 
+              <th style={{ width: "100px" }}>Projects</th> 
               <th style={{ width: "120px" }}>Assignee</th> 
             </tr>
           </thead>
@@ -261,6 +263,9 @@ const IssuePage = () => {
                 </td>
                 <td>
                   <Typography level="body-sm">{issue.title}</Typography>
+                </td>
+                <td>
+                  <Typography level="body-sm">{issue.project}</Typography>
                 </td>
                 <td>{renderPriorityBadge(issue.priority)}</td>
                 <td>
