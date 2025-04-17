@@ -1,325 +1,472 @@
-"use client"
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { 
-  Box, 
-  Typography, 
-  Sheet, 
-  Input, 
-  Textarea, 
-  Button, 
-  Chip, 
-  IconButton, 
-  Avatar, 
-  Card, 
-  CardContent, 
-  Divider, 
-  Stack, 
-  Grid
-} from '@mui/joy';
-import { ChevronLeft, X, Info, Plus } from 'lucide-react';
+'use client';
 
-type ProjectFormData = {
-  projectName: string;
-  projectKey: string;
-  description: string;
-  teamMembers: string[];
+import { useState } from 'react';
+import { useRouter as useNextRouter } from 'next/navigation';
+import {
+  Box,
+  Typography,
+  Sheet,
+  Card,
+  CardContent,
+  Button,
+  IconButton,
+  Divider,
+  Chip,
+  Avatar,
+  Modal,
+  ModalDialog,
+  ModalClose,
+  Input,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanel,
+  List,
+  ListItem,
+  ListItemContent,
+  ListItemDecorator,
+  CircularProgress,
+  Stack
+} from '@mui/joy';
+import {
+  Users,
+  Trash2,
+  Mail,
+  ArrowLeft,
+  UserPlus,
+  Settings,
+  PlusCircle,
+  Activity,
+  Calendar,
+  Grid as GridIcon,
+  HelpCircle,
+  Search,
+  MessageSquare,
+  MoreVertical
+} from 'lucide-react';
+
+// Mock project data
+const projectData = {
+  id: 'PROJ-123',
+  name: 'Customer Portal Redesign',
+  description: 'Redesign and rebuild the customer portal with improved UX and additional features.',
+  type: 'scrum',
+  createdAt: '2025-01-15',
+  members: [
+    { id: 1, name: 'Sarah Johnson', email: 'sarah.j@example.com', avatar: '/api/placeholder/40/40', role: 'Project Lead' },
+    { id: 2, name: 'Michael Torres', email: 'michael.t@example.com', avatar: '/api/placeholder/40/40', role: 'Developer' },
+    { id: 3, name: 'Aisha Patel', email: 'aisha.p@example.com', avatar: '/api/placeholder/40/40', role: 'Designer' }
+  ],
+  boards: [
+    { id: 1, name: 'Sprint 1', status: 'In Progress' },
+    { id: 2, name: 'Backlog', status: 'Active' }
+  ]
 };
 
-type ProjectTemplate = 'scrum' | 'kanban' | 'basic';
-
-const ProjectCreationPage = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<ProjectFormData>();
-  const [selectedTemplate, setSelectedTemplate] = useState<ProjectTemplate | null>(null);
-  const [teamMembers, setTeamMembers] = useState([
-    { id: 1, name: 'Sarah K.', email: 'sarah.k@example.com', avatar: '/api/placeholder/40/40' },
-    { id: 2, name: 'Mike T.', email: 'mike.t@example.com', avatar: '/api/placeholder/40/40' }
-  ]);
+export default function ProjectDetailPage() {
+  const router = useNextRouter();
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
+  const [activeTab, setActiveTab] = useState(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const onSubmit = (data: ProjectFormData) => {
-    console.log({ ...data, template: selectedTemplate, teamMembers });
-    // Handle form submission logic here
+  const handleInviteUser = () => {
+    // Logic to invite user would go here
+    console.log('Inviting user:', inviteEmail);
+    setInviteEmail('');
+    setInviteModalOpen(false);
   };
 
-  const handleRemoveMember = (id: number) => {
-    setTeamMembers(teamMembers.filter(member => member.id !== id));
+  const handleDeleteProject = () => {
+    setIsDeleting(true);
+    // Simulate deletion process
+    setTimeout(() => {
+      setIsDeleting(false);
+      setDeleteModalOpen(false);
+      // Would typically redirect to projects list
+      router.push('/projects');
+    }, 1500);
   };
 
-  const handleTemplateSelect = (template: ProjectTemplate) => {
-    setSelectedTemplate(template);
+  const navigateToCreateProject = () => {
+    router.push('/projects/create');
+  };
+
+  const navigateToAllProjects = () => {
+    router.push('/projects');
   };
 
   return (
-    <Box sx={{ maxWidth: 800, margin: '0 auto', padding: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+    <Box sx={{ maxWidth: 1200, margin: '0 auto', p: 3 }}>
+      {/* Top navigation */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Button 
-          variant="plain" 
-          startDecorator={<ChevronLeft size={16} />}
-          sx={{ mr: 1 }}
+          variant="outlined" 
+          color="neutral" 
+          startDecorator={<ArrowLeft size={16} />}
+          onClick={navigateToAllProjects}
         >
-          Projects
+          All Projects
         </Button>
-        <Typography level="body-sm">Create Project</Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button 
+            variant="solid" 
+            color="primary" 
+            startDecorator={<PlusCircle size={16} />}
+            onClick={navigateToCreateProject}
+          >
+            Create New Project
+          </Button>
+          <IconButton variant="soft" color="neutral">
+            <Settings size={20} />
+          </IconButton>
+        </Box>
       </Box>
 
-      <Typography level="h2" sx={{ mb: 3 }}>Create New Project</Typography>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Box sx={{ mb: 4 }}>
-          <Typography level="title-md" sx={{ mb: 2 }}>Project Details</Typography>
-          
-          <Stack spacing={2}>
+      {/* Project header */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
             <Box>
-              <Typography level="body-sm" sx={{ mb: 1 }}>Project Name</Typography>
-              <Input 
-                placeholder="Enter project name" 
-                {...register('projectName', { required: true })} 
-                error={!!errors.projectName}
-                fullWidth
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Chip size="sm" variant="soft" color="primary">{projectData.id}</Chip>
+                <Chip size="sm" variant="soft" color="success">Active</Chip>
+              </Box>
+              <Typography level="h2" sx={{ mb: 1 }}>{projectData.name}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button 
+                variant="outlined" 
+                color="danger"
+                startDecorator={<Trash2 size={16} />}
+                onClick={() => setDeleteModalOpen(true)}
+              >
+                Delete Project
+              </Button>
+              <Button 
+                variant="outlined" 
+                color="primary"
+                startDecorator={<UserPlus size={16} />}
+                onClick={() => setInviteModalOpen(true)}
+              >
+                Invite Users
+              </Button>
+            </Box>
+          </Box>
+          <Typography level="body-md" sx={{ mb: 2 }}>{projectData.description}</Typography>
+          <Divider sx={{ my: 2 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 3 }}>
+              <Box>
+                <Typography level="body-xs" color="neutral">Type</Typography>
+                <Typography level="body-md">Scrum Project</Typography>
+              </Box>
+              <Box>
+                <Typography level="body-xs" color="neutral">Created</Typography>
+                <Typography level="body-md">Jan 15, 2025</Typography>
+              </Box>
+              <Box>
+                <Typography level="body-xs" color="neutral">Members</Typography>
+                <Box sx={{ display: 'flex', mt: 0.5 }}>
+                  {projectData.members.slice(0, 3).map((member, index) => (
+                    <Avatar
+                      key={member.id}
+                      src={member.avatar}
+                      size="sm"
+                      sx={{ ml: index > 0 ? -1 : 0 }}
+                    />
+                  ))}
+                  {projectData.members.length > 3 && (
+                    <Avatar size="sm" sx={{ ml: -1 }}>+{projectData.members.length - 3}</Avatar>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Input
+                size="sm"
+                placeholder="Search in project..."
+                startDecorator={<Search size={16} />}
+                sx={{ width: 220 }}
               />
             </Box>
-            
-            <Box>
-              <Typography level="body-sm" sx={{ mb: 1 }}>Project Key</Typography>
-              <Input 
-                placeholder="e.g., PROJ-123-XYZ" 
-                {...register('projectKey', { required: true })} 
-                error={!!errors.projectKey}
-                fullWidth
-                endDecorator={<Info size={16} />}
-              />
-            </Box>
-            
-            <Box>
-              <Typography level="body-sm" sx={{ mb: 1 }}>Description</Typography>
-              <Textarea 
-                placeholder="Describe the purpose of this project" 
-                minRows={3}
-                {...register('description')} 
-                sx={{ width: '100%' }}
-              />
-            </Box>
-          </Stack>
-        </Box>
+          </Box>
+        </CardContent>
+      </Card>
 
-        <Box sx={{ mb: 4 }}>
-          <Typography level="title-md" sx={{ mb: 2 }}>Project Template</Typography>
-          
-          <Grid container spacing={2}>
-            <Grid xs={12} sm={4}>
-              <Card 
-                variant={selectedTemplate === 'scrum' ? 'soft' : 'outlined'} 
-                onClick={() => handleTemplateSelect('scrum')}
-                sx={{ 
-                  cursor: 'pointer',
-                  borderColor: selectedTemplate === 'scrum' ? 'primary.500' : undefined,
-                  bgcolor: selectedTemplate === 'scrum' ? 'primary.50' : undefined,
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Sheet 
-                      variant="soft" 
-                      color="primary" 
-                      sx={{ p: 1, borderRadius: 'sm', mr: 1 }}
-                    >
-                      <Box sx={{ width: 24, height: 24 }} />
-                    </Sheet>
-                    <Typography level="title-md">Scrum</Typography>
-                  </Box>
-                  <Typography level="body-sm">
-                    Manage complex projects with sprints, and team-wide agile processes.
-                  </Typography>
+      {/* Main content tabs */}
+      <Tabs 
+        value={activeTab} 
+        onChange={(_, value) => setActiveTab(value as number)}
+        sx={{ mb: 3 }}
+      >
+        <TabList>
+          <Tab>Overview</Tab>
+          <Tab>Boards</Tab>
+          <Tab>Members</Tab>
+          <Tab>Settings</Tab>
+        </TabList>
+        
+        <TabPanel value={0}>
+          <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+            <Card sx={{ width: '100%', mb: 3 }}>
+              <CardContent>
+                <Typography level="title-md" sx={{ mb: 2 }}>Project Actions</Typography>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   <Button 
-                    variant="solid" 
+                    variant="soft" 
                     color="primary" 
-                    size="sm" 
-                    sx={{ mt: 2 }}
+                    startDecorator={<PlusCircle size={16} />}
+                    onClick={navigateToCreateProject}
                   >
-                    Select
+                    Create New Project
                   </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-            
-            <Grid xs={12} sm={4}>
-              <Card 
-                variant={selectedTemplate === 'kanban' ? 'soft' : 'outlined'} 
-                onClick={() => handleTemplateSelect('kanban')}
-                sx={{ 
-                  cursor: 'pointer',
-                  borderColor: selectedTemplate === 'kanban' ? 'primary.500' : undefined,
-                  bgcolor: selectedTemplate === 'kanban' ? 'primary.50' : undefined,
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Sheet 
-                      variant="soft" 
-                      color="primary" 
-                      sx={{ p: 1, borderRadius: 'sm', mr: 1 }}
-                    >
-                      <Box sx={{ width: 24, height: 24 }} />
-                    </Sheet>
-                    <Typography level="title-md">Kanban</Typography>
-                  </Box>
-                  <Typography level="body-sm">
-                    Visualize and manage workflow with continuously delivered items.
-                  </Typography>
                   <Button 
-                    variant="solid" 
-                    color="primary" 
-                    size="sm" 
-                    sx={{ mt: 2 }}
+                    variant="soft" 
+                    color="neutral" 
+                    startDecorator={<Search size={16} />}
+                    onClick={navigateToAllProjects}
                   >
-                    Select
+                    Get All Projects
                   </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-            
-            <Grid xs={12} sm={4}>
-              <Card 
-                variant={selectedTemplate === 'basic' ? 'soft' : 'outlined'} 
-                onClick={() => handleTemplateSelect('basic')}
-                sx={{ 
-                  cursor: 'pointer',
-                  borderColor: selectedTemplate === 'basic' ? 'primary.500' : undefined,
-                  bgcolor: selectedTemplate === 'basic' ? 'primary.50' : undefined,
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Sheet 
-                      variant="soft" 
-                      color="primary" 
-                      sx={{ p: 1, borderRadius: 'sm', mr: 1 }}
-                    >
-                      <Box sx={{ width: 24, height: 24 }} />
-                    </Sheet>
-                    <Typography level="title-md">Basic</Typography>
-                  </Box>
-                  <Typography level="body-sm">
-                    Simple tracking with minimal process overhead.
-                  </Typography>
                   <Button 
-                    variant="solid" 
-                    color="primary" 
-                    size="sm" 
-                    sx={{ mt: 2 }}
+                    variant="soft" 
+                    color="neutral" 
+                    startDecorator={<Activity size={16} />}
                   >
-                    Select
+                    Get One Project
                   </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Box>
+                  <Button 
+                    variant="soft" 
+                    color="danger" 
+                    startDecorator={<Trash2 size={16} />}
+                    onClick={() => setDeleteModalOpen(true)}
+                  >
+                    Delete Project
+                  </Button>
+                  <Button 
+                    variant="soft" 
+                    color="success" 
+                    startDecorator={<UserPlus size={16} />}
+                    onClick={() => setInviteModalOpen(true)}
+                  >
+                    Invite Users
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
 
-        <Box sx={{ mb: 4 }}>
-          <Typography level="title-md" sx={{ mb: 2 }}>Team Members</Typography>
-          
+            <Card sx={{ flex: '1 1 48%', minWidth: 300 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography level="title-md">Project Boards</Typography>
+                  <Button 
+                    size="sm" 
+                    variant="plain" 
+                    endDecorator={<ArrowLeft size={16} style={{ transform: 'rotate(180deg)' }} />}
+                  >
+                    View All
+                  </Button>
+                </Box>
+                <List size="sm">
+                  {projectData.boards.map(board => (
+                    <ListItem key={board.id}>
+                      <ListItemDecorator>
+                        <GridIcon size={18} />
+                      </ListItemDecorator>
+                      <ListItemContent>{board.name}</ListItemContent>
+                      <Chip size="sm" variant="soft" color={board.status === 'In Progress' ? 'warning' : 'success'}>
+                        {board.status}
+                      </Chip>
+                    </ListItem>
+                  ))}
+                </List>
+                <Button 
+                  fullWidth 
+                  variant="outlined" 
+                  color="neutral" 
+                  startDecorator={<PlusCircle size={16} />}
+                  sx={{ mt: 2 }}
+                >
+                  Create New Board
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ flex: '1 1 48%', minWidth: 300 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography level="title-md">Team Members</Typography>
+                  <Button 
+                    size="sm" 
+                    variant="plain" 
+                    endDecorator={<ArrowLeft size={16} style={{ transform: 'rotate(180deg)' }} />}
+                  >
+                    View All
+                  </Button>
+                </Box>
+                <List size="sm">
+                  {projectData.members.map(member => (
+                    <ListItem key={member.id}>
+                      <ListItemDecorator>
+                        <Avatar size="sm" src={member.avatar} />
+                      </ListItemDecorator>
+                      <ListItemContent>
+                        <Typography level="body-sm">{member.name}</Typography>
+                        <Typography level="body-xs" color="neutral">{member.email}</Typography>
+                      </ListItemContent>
+                      <Chip size="sm" variant="soft" color="neutral">
+                        {member.role}
+                      </Chip>
+                    </ListItem>
+                  ))}
+                </List>
+                <Button 
+                  fullWidth 
+                  variant="outlined" 
+                  color="neutral" 
+                  startDecorator={<UserPlus size={16} />}
+                  onClick={() => setInviteModalOpen(true)}
+                  sx={{ mt: 2 }}
+                >
+                  Invite Team Member
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ width: '100%' }}>
+              <CardContent>
+                <Typography level="title-md" sx={{ mb: 2 }}>Recent Activity</Typography>
+                <List size="sm">
+                  <ListItem>
+                    <ListItemDecorator>
+                      <Avatar size="sm" src="/api/placeholder/40/40" />
+                    </ListItemDecorator>
+                    <ListItemContent>
+                      <Typography level="body-sm">Sarah Johnson created a new task: "Implement user authentication"</Typography>
+                      <Typography level="body-xs" color="neutral">2 hours ago</Typography>
+                    </ListItemContent>
+                  </ListItem>
+                  <ListItem>
+                    <ListItemDecorator>
+                      <Avatar size="sm" src="/api/placeholder/40/40" />
+                    </ListItemDecorator>
+                    <ListItemContent>
+                      <Typography level="body-sm">Michael Torres moved "Design review" to Done</Typography>
+                      <Typography level="body-xs" color="neutral">Yesterday at 4:23 PM</Typography>
+                    </ListItemContent>
+                  </ListItem>
+                  <ListItem>
+                    <ListItemDecorator>
+                      <Avatar size="sm" src="/api/placeholder/40/40" />
+                    </ListItemDecorator>
+                    <ListItemContent>
+                      <Typography level="body-sm">Aisha Patel added comments to "API integration"</Typography>
+                      <Typography level="body-xs" color="neutral">Yesterday at 2:15 PM</Typography>
+                    </ListItemContent>
+                  </ListItem>
+                </List>
+                <Button 
+                  fullWidth 
+                  variant="outlined" 
+                  color="neutral" 
+                  sx={{ mt: 2 }}
+                >
+                  View All Activity
+                </Button>
+              </CardContent>
+            </Card>
+          </Box>
+        </TabPanel>
+        
+        <TabPanel value={1}>
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Typography level="body-lg">Boards content would be displayed here</Typography>
+          </Box>
+        </TabPanel>
+        
+        <TabPanel value={2}>
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Typography level="body-lg">Members management would be displayed here</Typography>
+          </Box>
+        </TabPanel>
+        
+        <TabPanel value={3}>
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Typography level="body-lg">Project settings would be displayed here</Typography>
+          </Box>
+        </TabPanel>
+      </Tabs>
+
+      {/* Invite user modal */}
+      <Modal open={inviteModalOpen} onClose={() => setInviteModalOpen(false)}>
+        <ModalDialog sx={{ width: 400, maxWidth: '100%' }}>
+          <ModalClose />
+          <Typography level="h4" sx={{ mb: 2 }}>Invite Users to Project</Typography>
+          <Typography level="body-md" sx={{ mb: 3 }}>
+            Enter email addresses of users you want to invite to this project.
+          </Typography>
           <Box sx={{ mb: 3 }}>
-            <Typography level="body-sm" sx={{ mb: 1 }}>Invite Members</Typography>
-            <Input 
-              placeholder="Enter email addresses..."
+            <Input
+              fullWidth
+              placeholder="Enter email address"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              fullWidth
-              endDecorator={
-                <IconButton 
-                  variant="plain" 
-                  color="neutral"
-                  disabled={!inviteEmail.trim()}
-                  onClick={() => setInviteEmail('')}
-                >
-                  <Info size={16} />
-                </IconButton>
-              }
+              startDecorator={<Mail size={16} />}
+              sx={{ mb: 2 }}
             />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+              <Button 
+                variant="plain" 
+                color="neutral" 
+                onClick={() => setInviteModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="solid" 
+                color="primary" 
+                startDecorator={<UserPlus size={16} />}
+                onClick={handleInviteUser}
+                disabled={!inviteEmail.trim()}
+              >
+                Send Invitation
+              </Button>
+            </Box>
           </Box>
-          
-          <Box>
-            <Typography level="body-sm" sx={{ mb: 1 }}>Added Members</Typography>
-            <Stack spacing={1}>
-              {teamMembers.map(member => (
-                <Box 
-                  key={member.id}
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    p: 1,
-                    borderRadius: 'sm',
-                    bgcolor: 'background.surface',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar 
-                      src={member.avatar} 
-                      size="sm" 
-                      sx={{ mr: 1 }}
-                    />
-                    <Box>
-                      <Typography level="body-sm">{member.name}</Typography>
-                      <Typography level="body-xs" color="neutral">{member.email}</Typography>
-                    </Box>
-                  </Box>
-                  <IconButton 
-                    variant="plain" 
-                    color="neutral" 
-                    size="sm"
-                    onClick={() => handleRemoveMember(member.id)}
-                  >
-                    <X size={16} />
-                  </IconButton>
-                </Box>
-              ))}
-            </Stack>
-          </Box>
-        </Box>
+        </ModalDialog>
+      </Modal>
 
-        <Box sx={{ mb: 4 }}>
-          <Typography level="title-md" sx={{ mb: 2 }}>Board Setup</Typography>
-          
-          <Box>
-            <Typography level="body-sm" sx={{ mb: 1 }}>Default Columns</Typography>
-            <Grid container spacing={2}>
-              {['To Do', 'In Progress', 'Review', 'Done'].map((column, index) => (
-                <Grid key={index} xs={6} sm={3}>
-                  <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <CardContent>
-                      <Typography level="body-xs" sx={{ mb: 1 }}>DEFAULT</Typography>
-                      <Typography level="body-md">{column}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+      {/* Delete project confirmation modal */}
+      <Modal open={deleteModalOpen} onClose={() => !isDeleting && setDeleteModalOpen(false)}>
+        <ModalDialog sx={{ width: 400, maxWidth: '100%' }}>
+          <ModalClose disabled={isDeleting} />
+          <Typography level="h4" sx={{ mb: 2, color: 'danger.500' }}>Delete Project</Typography>
+          <Typography level="body-md" sx={{ mb: 3 }}>
+            Are you sure you want to delete this project? This action cannot be undone and all project data will be permanently lost.
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+            <Button 
+              variant="plain" 
+              color="neutral" 
+              onClick={() => setDeleteModalOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="solid" 
+              color="danger" 
+              startDecorator={isDeleting ? <CircularProgress size="sm" /> : <Trash2 size={16} />}
+              onClick={handleDeleteProject}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Project'}
+            </Button>
           </Box>
-          
-          <Button 
-            variant="plain" 
-            color="primary" 
-            startDecorator={<Plus size={16} />}
-            sx={{ mt: 2 }}
-          >
-            Add Custom Column
-          </Button>
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-start', mt: 4 }}>
-          <Button type="submit" variant="solid" color="primary">
-            Create Project
-          </Button>
-          <Button variant="plain" color="neutral">
-            Cancel
-          </Button>
-        </Box>
-      </form>
+        </ModalDialog>
+      </Modal>
     </Box>
   );
-};
-
-export default ProjectCreationPage;
+}
