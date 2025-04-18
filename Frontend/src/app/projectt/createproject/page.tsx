@@ -103,120 +103,7 @@ const ProjectCreationPage = () => {
           </Stack>
         </Box>
 
-        <Box sx={{ mb: 4 }}>
-          <Typography level="title-md" sx={{ mb: 2 }}>Project Template</Typography>
-          
-          <Grid container spacing={2}>
-            <Grid xs={12} sm={4}>
-              <Card 
-                variant={selectedTemplate === 'scrum' ? 'soft' : 'outlined'} 
-                onClick={() => handleTemplateSelect('scrum')}
-                sx={{ 
-                  cursor: 'pointer',
-                  borderColor: selectedTemplate === 'scrum' ? 'primary.500' : undefined,
-                  bgcolor: selectedTemplate === 'scrum' ? 'primary.50' : undefined,
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Sheet 
-                      variant="soft" 
-                      color="primary" 
-                      sx={{ p: 1, borderRadius: 'sm', mr: 1 }}
-                    >
-                      <Box sx={{ width: 24, height: 24 }} />
-                    </Sheet>
-                    <Typography level="title-md">Scrum</Typography>
-                  </Box>
-                  <Typography level="body-sm">
-                    Manage complex projects with sprints, and team-wide agile processes.
-                  </Typography>
-                  <Button 
-                    variant="solid" 
-                    color="primary" 
-                    size="sm" 
-                    sx={{ mt: 2 }}
-                  >
-                    Select
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-            
-            <Grid xs={12} sm={4}>
-              <Card 
-                variant={selectedTemplate === 'kanban' ? 'soft' : 'outlined'} 
-                onClick={() => handleTemplateSelect('kanban')}
-                sx={{ 
-                  cursor: 'pointer',
-                  borderColor: selectedTemplate === 'kanban' ? 'primary.500' : undefined,
-                  bgcolor: selectedTemplate === 'kanban' ? 'primary.50' : undefined,
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Sheet 
-                      variant="soft" 
-                      color="primary" 
-                      sx={{ p: 1, borderRadius: 'sm', mr: 1 }}
-                    >
-                      <Box sx={{ width: 24, height: 24 }} />
-                    </Sheet>
-                    <Typography level="title-md">Kanban</Typography>
-                  </Box>
-                  <Typography level="body-sm">
-                    Visualize and manage workflow with continuously delivered items.
-                  </Typography>
-                  <Button 
-                    variant="solid" 
-                    color="primary" 
-                    size="sm" 
-                    sx={{ mt: 2 }}
-                  >
-                    Select
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-            
-            <Grid xs={12} sm={4}>
-              <Card 
-                variant={selectedTemplate === 'basic' ? 'soft' : 'outlined'} 
-                onClick={() => handleTemplateSelect('basic')}
-                sx={{ 
-                  cursor: 'pointer',
-                  borderColor: selectedTemplate === 'basic' ? 'primary.500' : undefined,
-                  bgcolor: selectedTemplate === 'basic' ? 'primary.50' : undefined,
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Sheet 
-                      variant="soft" 
-                      color="primary" 
-                      sx={{ p: 1, borderRadius: 'sm', mr: 1 }}
-                    >
-                      <Box sx={{ width: 24, height: 24 }} />
-                    </Sheet>
-                    <Typography level="title-md">Basic</Typography>
-                  </Box>
-                  <Typography level="body-sm">
-                    Simple tracking with minimal process overhead.
-                  </Typography>
-                  <Button 
-                    variant="solid" 
-                    color="primary" 
-                    size="sm" 
-                    sx={{ mt: 2 }}
-                  >
-                    Select
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Box>
-
+       
         <Box sx={{ mb: 4 }}>
           <Typography level="title-md" sx={{ mb: 2 }}>Team Members</Typography>
           
@@ -299,14 +186,7 @@ const ProjectCreationPage = () => {
             </Grid>
           </Box>
           
-          <Button 
-            variant="plain" 
-            color="primary" 
-            startDecorator={<Plus size={16} />}
-            sx={{ mt: 2 }}
-          >
-            Add Custom Column
-          </Button>
+         
         </Box>
 
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-start', mt: 4 }}>

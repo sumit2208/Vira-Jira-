@@ -7,21 +7,14 @@ const ProjectSchema = new Schema({
     required: true,
   },
   description: String,
-  owner: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+  project_key: {
+    type: String, 
   },
-  members: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
+  members: [String],
   createdAt: {
     type: Date,
     default: Date.now,
   },
-});
+}, { collection: "project" });
 
 module.exports = mongoose.model("project", ProjectSchema);

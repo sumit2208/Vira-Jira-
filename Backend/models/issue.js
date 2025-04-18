@@ -18,4 +18,4 @@ const issueSchema = new mongoose.Schema({
   }
 }, { collection: "vira" }); // 👈 Explicitly set collection name
 
-module.exports = mongoose.model("Issue", issueSchema);
+module.exports = mongoose.model("vira", issueSchema);

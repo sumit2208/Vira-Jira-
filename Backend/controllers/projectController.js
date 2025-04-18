@@ -1,24 +1,22 @@
-const project =  require("../models/project")
+const Project = require("../models/project");
 
-
-const createProject = async (req,res)=> {
+const createProject = async (req, res) => {
     try {
-         const newproject = new project(req.body)
-         await newproject.save()
-         res.status(201).json(newproject)
+        const newproject = new Project(req.body);
+        await newproject.save();
+        res.status(201).json(newproject);
     } catch (error) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
-const allProject = async(req,res) =>{
+const allProject = async (req, res) => {
     try {
-         const projects  = await projects .find();
-         res.status(201).json(projects )
-    } catch (error) {   
-        res.status(500).json({errro:err.message})
+        const projects = await Project.find();
+        res.status(200).json(projects);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-}
- 
+};
 
- module.exports = { createProject,allProject };
+module.exports = { createProject, allProject };
