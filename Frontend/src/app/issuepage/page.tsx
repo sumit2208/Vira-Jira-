@@ -2,7 +2,7 @@
 import {
   Button,
   Box,
-  Typography, 
+  Typography,
   Sheet,
   Table,
   IconButton,
@@ -18,12 +18,7 @@ import {
 } from "@mui/joy";
 import Link from "next/link";
 import React, { useState } from "react";
-import { 
-  Filter, 
-  Bug,
-  FileCode,
-  FileText, 
-} from "lucide-react";
+import { Filter, Bug, FileCode, FileText } from "lucide-react";
 import { useGetIssues } from "../../hook/issuehook";
 
 // Define TypeScript interfaces for our data
@@ -32,10 +27,9 @@ interface Issue {
   title: string;
   priority: "High" | "Medium" | "Low";
   assignee: string;
-  project:String,
+  project: String;
   type: "bug" | "code" | "doc";
-  description?:String
-  date?:Date
+  description?: String;
 }
 
 type PriorityColor = "danger" | "warning" | "success" | "neutral";
@@ -58,8 +52,6 @@ const IssuePage = () => {
 
   const handleFilterOpen = () => setFilterOpen(true);
   const handleFilterClose = () => setFilterOpen(false);
-
-  
 
   const getIssueIcon = (type: Issue["type"]) => {
     switch (type) {
@@ -119,7 +111,6 @@ const IssuePage = () => {
       </Box>
 
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        
         <Button
           variant="outlined"
           color="neutral"
@@ -216,7 +207,7 @@ const IssuePage = () => {
       </Modal>
 
       <Typography level="body-sm" sx={{ color: "text.secondary", mb: 2 }}>
-        Showing 15 issues
+        Showing {issues.length} {issues.length === 1 ? "issue" : "issues"}
       </Typography>
 
       <Sheet
@@ -245,14 +236,14 @@ const IssuePage = () => {
             <tr>
               <th style={{ width: "80px" }}>ID</th>
               <th>Title</th>
-              <th style={{ width: "100px" }}>Priority</th> 
-              <th style={{ width: "100px" }}>Projects</th> 
-              <th style={{ width: "120px" }}>Assignee</th> 
+              <th style={{ width: "100px" }}>Projects</th>
+              <th style={{ width: "100px" }}>Priority</th>
+              <th style={{ width: "120px" }}>Assignee</th>
             </tr>
           </thead>
           <tbody>
-            {issues.map((issue) => (
-              <tr key={issue.id}>
+            {issues.map((issue, index) => (
+              <tr key={issue.id || index}>
                 <td>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     {getIssueIcon(issue.type)}
@@ -270,7 +261,7 @@ const IssuePage = () => {
                 <td>{renderPriorityBadge(issue.priority)}</td>
                 <td>
                   <Typography level="body-sm">{issue.assignee}</Typography>
-                </td> 
+                </td>
               </tr>
             ))}
           </tbody>

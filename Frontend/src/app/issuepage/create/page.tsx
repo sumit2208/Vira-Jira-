@@ -13,9 +13,12 @@ import {
 } from "@mui/joy";
 import { useForm, Controller } from "react-hook-form";
 import { Issue, useCreateIssue } from "../../../hook/issuehook";
+import { useGetProject} from "../../../hook/projecthook"
 
 const Page = () => {
   const { mutate } = useCreateIssue();
+  const {data} = useGetProject()
+
   const { handleSubmit, control,reset  } = useForm<Issue>({
     defaultValues: {
       title: "",
@@ -68,24 +71,29 @@ const Page = () => {
 
         {/* Project, Type, Priority */}
         <Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <FormControl>
-            <FormLabel>Project</FormLabel>
-            <Controller
-              name="project"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onChange={(_, value) => field.onChange(value)} // Note the value handler
-                  className="bg-[#F8F8F7]"
-                  placeholder="Select project"
-                >
-                  <Option value="project-1">Project 1</Option>
-                  <Option value="project-2">Project 2</Option>
-                </Select>
-              )}
-            />
-          </FormControl>
+        <FormControl>
+  <FormLabel>Project</FormLabel>
+  <Controller
+    name="project"
+    control={control}
+    render={({ field }) => (
+      <Select
+        value={field.value}
+        onChange={(_, value) => field.onChange(value)}
+        className="bg-[#F8F8F7]"
+        placeholder="Select project"
+      >
+       {data?.map((proj: { name: string }) => (
+  <Option key={proj.name} value={proj.name}>
+    {proj.name}
+  </Option>
+))}
+
+      </Select>
+    )}
+  />
+</FormControl>
+
 
           <FormControl>
             <FormLabel>Issue Type</FormLabel>

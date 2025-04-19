@@ -18,7 +18,6 @@ const fetchIssues = async (): Promise<Issue[]> => {
   const { data } = await axios.get("http://localhost:5000/api/issues/get");
   return data;
 };
-
 export const useGetIssues = () => {
   return useQuery<Issue[]>({
     queryKey: ["issues"],
@@ -34,11 +33,10 @@ const createIssue = async (issue: Issue): Promise<Issue> => {
 
 export const useCreateIssue = () => {
   const queryClient = useQueryClient();
-
-  return useMutation({
+  
+    return useMutation({
     mutationFn: createIssue,
-    onSuccess: () => {
-      // Refresh the issues list after successful creation
+    onSuccess: () => { 
       queryClient.invalidateQueries({ queryKey: ["issues"] });
     },
   });
