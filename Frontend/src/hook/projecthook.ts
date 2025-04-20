@@ -6,7 +6,7 @@ export interface project {
     name:string,
     description:string,
     project_key:string,
-    members:[string],
+    members: string[],
     createdAt:string
 }
 
@@ -25,20 +25,25 @@ export const useGetProject= ()=>{
 
 
 
-const createProject = async (): Promise<project[]>=>{
-    const {data} = await axios.post("http://localhost:5000/api/project/createproject")
-    return data
-} 
-export const useCreateProject = ()=>{
-    const queryclient = useQueryClient();
+const createProject = async (newProject: project): Promise<project> => {
+    const { data } = await axios.post("http://localhost:5000/api/project/createproject", newProject, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return data;
+};
+
+export const useCreateProject = () => {
+    const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn:createProject,
-        onSuccess:()=>{
-            queryclient.invalidateQueries({queryKey:["project"]})
-        }
-    }) 
-}
+        mutationFn: createProject, // Pass the payload to the mutation function
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["project"] }); // Invalidate the cache to refresh data
+        },
+    });
+};
 
 
 const FetchProjectById = async (id: string): Promise<project> => {
