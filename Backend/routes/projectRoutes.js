@@ -4,6 +4,6 @@ const { allProject, createProject, ProjectById } = require("../controllers/proje
 
 router.get("/getproject", allProject);
 router.post("/createproject", createProject);
-router.get("./projects/:id",ProjectById)
+router.get("/project/:id",ProjectById)
 
 module.exports = router;

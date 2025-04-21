@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React  from "react";
 import {
   Box,
   Typography,
@@ -13,7 +13,7 @@ import {
 } from "@mui/joy";
 import { Plus  } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { project,useGetProject } from "@/hook/projecthook";
+import {  useGetProject } from "@/hook/projecthook";
 
  
 
@@ -30,6 +30,7 @@ const ProjectsPage = () => {
 
   const handleViewProject = (projectId: string) => {
     router.push(`/projectt/${projectId}`);
+    console.log(projectId)
   };
 
   return (
@@ -75,7 +76,7 @@ const ProjectsPage = () => {
       ) : (
         <Grid container spacing={2}>
           {data?.map((project, index) => (
-            <Grid key={`${project.id}-${index}`} xs={12} sm={6} md={4}>
+            <Grid key={`${project._id}-${index}`} xs={12} sm={6} md={4}>
               <Card
                 variant="outlined"
                 sx={{
@@ -88,7 +89,7 @@ const ProjectsPage = () => {
                     cursor: "pointer",
                   },
                 }}
-                onClick={() => handleViewProject(project.id)}
+                onClick={() => handleViewProject(project._id)}
               >
                 <CardContent
                   sx={{
@@ -102,7 +103,7 @@ const ProjectsPage = () => {
                   <Stack spacing={2}>
                     <Box>
                       <Typography level="body-sm" color="neutral">ID</Typography>
-                      <Typography level="body-md">{project.id}</Typography>
+                      <Typography level="body-md">{project._id}</Typography>
                     </Box>
                     
                     <Box>

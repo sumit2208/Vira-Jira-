@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {   useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   Box,
   Typography,
@@ -16,41 +16,44 @@ import {
   CardContent,
 } from "@mui/joy";
 import { ChevronLeft, X, Info } from "lucide-react";
-import { project, useCreateProject } from "../../../hook/projecthook"; 
+import { project, useCreateProject } from "../../../hook/projecthook";
 import { useRouter } from "next/navigation";
 
- 
- 
 const ProjectCreationPage = () => {
-  const router = useRouter()
-  const { register, handleSubmit,reset, formState: { errors } } = useForm<project>();
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<project>();
   const [teamMembers, setTeamMembers] = useState([
-    { id: 1, name: "Sarah K.", email: "sarah.k@example.com", avatar: "/api/placeholder/40/40" },
-    { id: 2, name: "Mike T.", email: "mike.t@example.com", avatar: "/api/placeholder/40/40" },
+    {  email: "sarah.k@example.com" },
+    {  email: "mike.t@example.com" },
   ]);
+
+  const RemoveEmail = (email:string)=>{
+    setTeamMembers(teamMembers.filter((member)=>member.email!=email ))
+  }
   const [inviteEmail, setInviteEmail] = useState("");
-  const {mutate} = useCreateProject();
+  const { mutate } = useCreateProject();
 
-  const handleRemoveMember = (id: number) => {
-    setTeamMembers(teamMembers.filter((member) => member.id !== id));
-  };
-
+ 
   const onSubmit = async (formData: project) => {
     const payload: project = {
-      ...formData,
-      members: [teamMembers.map((member) => member.email).join(",")], // Convert array to single string
-      id: formData.id || "",
-      createdAt: new Date().toISOString(),
-  };
-  
+        ...formData,
+        members: teamMembers.map((member) => member.email), // Array of emails
+        _id: formData._id || "",
+        createdAt: new Date().toISOString(),
+    };
 
-    console.log("Payload:", payload); // Debugging
+    console.log("Payload:", payload);
 
     mutate(payload, {
         onSuccess: () => {
             alert("Project created successfully!");
-            reset(formData)
-            router.push("./projectt")
+            reset(formData);
+            router.push("./projectt");
         },
         onError: (error) => {
             console.error("Failed to create project:", error);
@@ -59,12 +62,15 @@ const ProjectCreationPage = () => {
     });
 };
 
-  
 
   return (
     <Box sx={{ maxWidth: 800, margin: "0 auto", padding: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Button variant="plain" startDecorator={<ChevronLeft size={16} />} sx={{ mr: 1 }}>
+        <Button
+          variant="plain"
+          startDecorator={<ChevronLeft size={16} />}
+          sx={{ mr: 1 }}
+        >
           Projects
         </Button>
         <Typography level="body-sm">Create Project</Typography>
@@ -86,6 +92,7 @@ const ProjectCreationPage = () => {
                 Project Name
               </Typography>
               <Input
+              required
                 placeholder="Enter project name"
                 {...register("name", { required: "Project name is required" })}
                 error={!!errors.name}
@@ -103,8 +110,11 @@ const ProjectCreationPage = () => {
                 Project Key
               </Typography>
               <Input
+              required
                 placeholder="e.g., PROJ-123-XYZ"
-                {...register("project_key", { required: "Project key is required" })}
+                {...register("project_key", {
+                  required: "Project key is required",
+                })}
                 error={!!errors.project_key}
                 fullWidth
                 endDecorator={<Info size={16} />}
@@ -121,6 +131,7 @@ const ProjectCreationPage = () => {
                 Description
               </Typography>
               <Textarea
+              required
                 placeholder="Describe the purpose of this project"
                 minRows={3}
                 {...register("description")}
@@ -141,6 +152,7 @@ const ProjectCreationPage = () => {
             </Typography>
             <Input
               placeholder="Enter email addresses..."
+              required
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               fullWidth
@@ -151,10 +163,7 @@ const ProjectCreationPage = () => {
                   disabled={!inviteEmail.trim()}
                   onClick={() => {
                     if (inviteEmail.trim()) {
-                      setTeamMembers([
-                        ...teamMembers,
-                        { id: Date.now(), name: inviteEmail, email: inviteEmail, avatar: "" },
-                      ]);
+                      setTeamMembers([...teamMembers, { email: inviteEmail }]);
                       setInviteEmail("");
                     }
                   }}
@@ -166,9 +175,9 @@ const ProjectCreationPage = () => {
           </Box>
 
           <Stack spacing={1}>
-            {teamMembers.map((member) => (
+            {teamMembers.map((member, index) => (
               <Box
-                key={member.id}
+                key={index}
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -179,9 +188,7 @@ const ProjectCreationPage = () => {
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Avatar src={member.avatar} size="sm" sx={{ mr: 1 }} />
                   <Box>
-                    <Typography level="body-sm">{member.name}</Typography>
                     <Typography level="body-xs" color="neutral">
                       {member.email}
                     </Typography>
@@ -191,7 +198,7 @@ const ProjectCreationPage = () => {
                   variant="plain"
                   color="neutral"
                   size="sm"
-                  onClick={() => handleRemoveMember(member.id)}
+                  onClick={() => RemoveEmail(member.email)}
                 >
                   <X size={16} />
                 </IconButton>
@@ -200,7 +207,9 @@ const ProjectCreationPage = () => {
           </Stack>
         </Box>
 
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-start", mt: 4 }}>
+        <Box
+          sx={{ display: "flex", gap: 2, justifyContent: "flex-start", mt: 4 }}
+        >
           <Button type="submit" variant="solid" color="primary">
             Create Project
           </Button>
