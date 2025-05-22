@@ -6,8 +6,7 @@ import Link from "next/link";
 import {
   Home,
   FolderOpen,
-  FlagTriangleRight,
-  BarChartBig, 
+  FlagTriangleRight, 
   Menu,
   X,
 } from "lucide-react";
@@ -73,12 +72,7 @@ const Sidebar = () => {
               <FlagTriangleRight size={18} /> Issues
             </Link>
 
-            <Link
-              href="./reportss"
-              className="flex items-center gap-3 cursor-pointer hover:text-gray-500"
-            >
-              <BarChartBig size={18} /> Reports
-            </Link>
+            
           </ul>
         </div>
       </div>

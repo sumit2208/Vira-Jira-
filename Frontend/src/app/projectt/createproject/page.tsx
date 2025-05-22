@@ -43,7 +43,7 @@ const ProjectCreationPage = () => {
     const payload: project = {
         ...formData,
         members: teamMembers.map((member) => member.email), // Array of emails
-        _id: formData._id || "",
+        // _id: formData._id || "",
         createdAt: new Date().toISOString(),
     };
 
