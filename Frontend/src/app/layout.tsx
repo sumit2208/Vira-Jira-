@@ -6,8 +6,7 @@ import {
   SignIn,
 } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "./globals.css"; 
 import Sidebar from "@/components/Sidebar";
 import Providers from "@/components/Providers";
 

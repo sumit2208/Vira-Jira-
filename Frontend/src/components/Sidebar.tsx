@@ -53,7 +53,7 @@ const Sidebar = () => {
 
           <ul className="space-y-4">
             <Link
-              href="./dashboard"
+              href="./dashborad"
               className="flex items-center gap-3 cursor-pointer hover:text-gray-500"
             >
               <Home size={18} /> Dashboard

@@ -170,7 +170,7 @@ export default function ProjectDetailPage() {
           boards: mockBoards
         };
         
-        setProjectData(mockData);
+        setProjectData(data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -323,14 +323,14 @@ export default function ProjectDetailPage() {
         onChange={(_, value) => setActiveTab(value as number)}
         sx={{ mb: 3 }}
       >
-        <TabList>
+        {/* <TabList>
           <Tab>Overview</Tab>
           <Tab>Boards</Tab>
           <Tab>Members</Tab>
           <Tab>Settings</Tab>
-        </TabList>
+        </TabList> */}
         
-        <TabPanel value={0}>
+        {/* <TabPanel value={0}>
           <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
             <Card sx={{ flex: '1 1 48%', minWidth: 300 }}>
               <CardContent>
@@ -414,10 +414,10 @@ export default function ProjectDetailPage() {
               </CardContent>
             </Card>
           </Box>
-        </TabPanel>
+        </TabPanel> */}
         
         {/* Boards Tab */}
-        <TabPanel value={1}>
+        {/* <TabPanel value={1}>
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
               <Typography level="h3">Project Boards</Typography>
@@ -494,10 +494,10 @@ export default function ProjectDetailPage() {
               ))}
             </Grid>
           </Box>
-        </TabPanel>
+        </TabPanel> */}
         
         {/* Members Tab */}
-        <TabPanel value={2}>
+        {/* <TabPanel value={2}>
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box>
@@ -581,7 +581,7 @@ export default function ProjectDetailPage() {
           <Box sx={{ p: 4, textAlign: 'center' }}>
             <Typography level="body-lg">Project settings would be displayed here</Typography>
           </Box>
-        </TabPanel>
+        </TabPanel> */}
       </Tabs>
 
       {/* Invite user modal */}

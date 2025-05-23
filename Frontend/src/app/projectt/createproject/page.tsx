@@ -8,12 +8,8 @@ import {
   Input,
   Textarea,
   Button,
-  IconButton,
-  Avatar,
-  Stack,
-  Grid,
-  Card,
-  CardContent,
+  IconButton, 
+  Stack, 
 } from "@mui/joy";
 import { ChevronLeft, X, Info } from "lucide-react";
 import { project, useCreateProject } from "../../../hook/projecthook";
