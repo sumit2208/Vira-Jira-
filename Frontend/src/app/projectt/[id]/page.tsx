@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter as useNextRouter, useParams } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { useRouter as useNextRouter, useParams } from "next/navigation";
+import { useDeleteProject } from "@/hook/projecthook";
 import {
   Box,
   Typography,
@@ -31,7 +32,7 @@ import {
   Stack,
   Badge,
   Textarea,
-} from '@mui/joy';
+} from "@mui/joy";
 import {
   Users,
   Trash2,
@@ -51,8 +52,8 @@ import {
   Clock,
   AlertCircle,
   Edit,
-  Plus
-} from 'lucide-react';
+  Plus,
+} from "lucide-react";
 
 interface Member {
   id: string;
@@ -68,7 +69,7 @@ interface Task {
   description: string;
   assignee: string;
   dueDate: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
 }
 
 interface Board {
@@ -89,64 +90,144 @@ interface ProjectData {
 }
 
 export default function ProjectDetailPage() {
-  
   const { id } = useParams();
   const router = useNextRouter();
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteEmail, setInviteEmail] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
   const [selectedBoard, setSelectedBoard] = useState<number | null>(null);
 
+  const { mutate: deleteProject } = useDeleteProject();
+
   // Mock data for development
   const mockMembers = [
-    { id: '1', name: 'Sarah Johnson', email: 'sarah.j@example.com', role: 'Project Manager', avatar: '/api/placeholder/40/40' },
-    { id: '2', name: 'Michael Torres', email: 'michael.t@example.com', role: 'Developer', avatar: '/api/placeholder/40/40' },
-    { id: '3', name: 'Aisha Patel', email: 'aisha.p@example.com', role: 'Designer', avatar: '/api/placeholder/40/40' },
-    { id: '4', name: 'John Smith', email: 'john.s@example.com', role: 'Developer', avatar: '/api/placeholder/40/40' },
-    { id: '5', name: 'Lisa Wong', email: 'lisa.w@example.com', role: 'QA Engineer', avatar: '/api/placeholder/40/40' },
+    {
+      id: "1",
+      name: "Sarah Johnson",
+      email: "sarah.j@example.com",
+      role: "Project Manager",
+      avatar: "/api/placeholder/40/40",
+    },
+    {
+      id: "2",
+      name: "Michael Torres",
+      email: "michael.t@example.com",
+      role: "Developer",
+      avatar: "/api/placeholder/40/40",
+    },
+    {
+      id: "3",
+      name: "Aisha Patel",
+      email: "aisha.p@example.com",
+      role: "Designer",
+      avatar: "/api/placeholder/40/40",
+    },
+    {
+      id: "4",
+      name: "John Smith",
+      email: "john.s@example.com",
+      role: "Developer",
+      avatar: "/api/placeholder/40/40",
+    },
+    {
+      id: "5",
+      name: "Lisa Wong",
+      email: "lisa.w@example.com",
+      role: "QA Engineer",
+      avatar: "/api/placeholder/40/40",
+    },
   ];
 
   const mockBoards = [
-    { 
-      id: 1, 
-      name: 'To Do', 
-      status: 'active',
+    {
+      id: 1,
+      name: "To Do",
+      status: "active",
       tasks: [
-        { id: 't1', title: 'Design user dashboard', description: 'Create wireframes for dashboard', assignee: 'Aisha Patel', dueDate: '2025-04-28', priority: 'high' as const },
-        { id: 't2', title: 'API documentation', description: 'Document REST API endpoints', assignee: 'Michael Torres', dueDate: '2025-04-30', priority: 'medium' as const },
-      ]
+        {
+          id: "t1",
+          title: "Design user dashboard",
+          description: "Create wireframes for dashboard",
+          assignee: "Aisha Patel",
+          dueDate: "2025-04-28",
+          priority: "high" as const,
+        },
+        {
+          id: "t2",
+          title: "API documentation",
+          description: "Document REST API endpoints",
+          assignee: "Michael Torres",
+          dueDate: "2025-04-30",
+          priority: "medium" as const,
+        },
+      ],
     },
-    { 
-      id: 2, 
-      name: 'In Progress', 
-      status: 'active',
+    {
+      id: 2,
+      name: "In Progress",
+      status: "active",
       tasks: [
-        { id: 't3', title: 'User authentication', description: 'Implement OAuth flow', assignee: 'John Smith', dueDate: '2025-04-25', priority: 'high' as const },
-        { id: 't4', title: 'Mobile responsive layout', description: 'Ensure app works on mobile devices', assignee: 'Aisha Patel', dueDate: '2025-04-27', priority: 'medium' as const },
-      ]
+        {
+          id: "t3",
+          title: "User authentication",
+          description: "Implement OAuth flow",
+          assignee: "John Smith",
+          dueDate: "2025-04-25",
+          priority: "high" as const,
+        },
+        {
+          id: "t4",
+          title: "Mobile responsive layout",
+          description: "Ensure app works on mobile devices",
+          assignee: "Aisha Patel",
+          dueDate: "2025-04-27",
+          priority: "medium" as const,
+        },
+      ],
     },
-    { 
-      id: 3, 
-      name: 'Review', 
-      status: 'active',
+    {
+      id: 3,
+      name: "Review",
+      status: "active",
       tasks: [
-        { id: 't5', title: 'Payment integration', description: 'Review Stripe implementation', assignee: 'Michael Torres', dueDate: '2025-04-23', priority: 'high' as const },
-      ]
+        {
+          id: "t5",
+          title: "Payment integration",
+          description: "Review Stripe implementation",
+          assignee: "Michael Torres",
+          dueDate: "2025-04-23",
+          priority: "high" as const,
+        },
+      ],
     },
-    { 
-      id: 4, 
-      name: 'Done', 
-      status: 'active',
+    {
+      id: 4,
+      name: "Done",
+      status: "active",
       tasks: [
-        { id: 't6', title: 'Project setup', description: 'Initialize project repository', assignee: 'John Smith', dueDate: '2025-04-15', priority: 'medium' as const },
-        { id: 't7', title: 'Requirements gathering', description: 'Document initial requirements', assignee: 'Sarah Johnson', dueDate: '2025-04-10', priority: 'high' as const },
-      ]
+        {
+          id: "t6",
+          title: "Project setup",
+          description: "Initialize project repository",
+          assignee: "John Smith",
+          dueDate: "2025-04-15",
+          priority: "medium" as const,
+        },
+        {
+          id: "t7",
+          title: "Requirements gathering",
+          description: "Document initial requirements",
+          assignee: "Sarah Johnson",
+          dueDate: "2025-04-10",
+          priority: "high" as const,
+        },
+      ],
     },
   ];
 
@@ -154,22 +235,24 @@ export default function ProjectDetailPage() {
     // Fetch project data based on the ID
     async function fetchProject() {
       try {
-       
-        const response = await fetch(`http://localhost:5000/api/project/project/${id}`);
-        if (!response.ok) throw new Error('Failed to fetch project data');
+        const response = await fetch(
+          `http://localhost:5000/api/project/project/${id}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch project data");
         const data = await response.json();
-        
+
         // Mock data for development
         const mockData = {
           _id: id as string,
           name: "Project Management System",
-          description: "A collaborative tool for managing projects, tasks, and team members with real-time updates.",
+          description:
+            "A collaborative tool for managing projects, tasks, and team members with real-time updates.",
           type: "Software Development",
           createdAt: "2025-04-01",
           members: mockMembers,
-          boards: mockBoards
+          boards: mockBoards,
         };
-        
+
         setProjectData(data);
       } catch (err: any) {
         setError(err.message);
@@ -180,53 +263,52 @@ export default function ProjectDetailPage() {
     fetchProject();
   }, [id]);
 
-  const handleInviteUser = () => { 
-    console.log('Inviting user:', inviteEmail);
-    setInviteEmail('');
+  const handleInviteUser = () => {
+    console.log("Inviting user:", inviteEmail);
+    setInviteEmail("");
     setInviteModalOpen(false);
   };
 
-  const handleDeleteProject = () => {
+  const handleDeleteProject = (_id: string) => {
     setIsDeleting(true);
-    // Simulate deletion process
+    deleteProject(_id);
     setTimeout(() => {
       setIsDeleting(false);
       setDeleteModalOpen(false);
-      // Would typically redirect to projects list
-      router.push('/projectt');
+      router.push("/projectt");
     }, 1500);
   };
 
   const navigateToCreateProject = () => {
-    router.push('/projectt/createproject');
+    router.push("/projectt/createproject");
   };
 
   const navigateToAllProjects = () => {
-    router.push('/projectt');
+    router.push("/projectt");
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high':
-        return 'danger';
-      case 'medium':
-        return 'warning';
-      case 'low':
-        return 'success';
+      case "high":
+        return "danger";
+      case "medium":
+        return "warning";
+      case "low":
+        return "success";
       default:
-        return 'neutral';
+        return "neutral";
     }
   };
 
   const getBoardIcon = (boardName: string) => {
     switch (boardName) {
-      case 'To Do':
+      case "To Do":
         return <Clock size={16} />;
-      case 'In Progress':
+      case "In Progress":
         return <Activity size={16} />;
-      case 'Review':
+      case "Review":
         return <AlertCircle size={16} />;
-      case 'Done':
+      case "Done":
         return <CheckCircle size={16} />;
       default:
         return <HelpCircle size={16} />;
@@ -240,7 +322,14 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <CircularProgress size="lg" />
       </Box>
     );
@@ -248,30 +337,41 @@ export default function ProjectDetailPage() {
 
   if (error) {
     return (
-      <Box sx={{ p: 4, textAlign: 'center' }}>
-        <Typography level="h4" color="danger">Error</Typography>
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <Typography level="h4" color="danger">
+          Error
+        </Typography>
         <Typography>{error}</Typography>
-        <Button onClick={navigateToAllProjects} sx={{ mt: 2 }}>Go Back to Projects</Button>
+        <Button onClick={navigateToAllProjects} sx={{ mt: 2 }}>
+          Go Back to Projects
+        </Button>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, margin: '0 auto', p: 3 }}>
+    <Box sx={{ maxWidth: 1200, margin: "0 auto", p: 3 }}>
       {/* Top navigation */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-        <Button 
-          variant="outlined" 
-          color="neutral" 
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 3,
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="neutral"
           startDecorator={<ArrowLeft size={16} />}
           onClick={navigateToAllProjects}
         >
           All Projects
         </Button>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button 
-            variant="solid" 
-            color="primary" 
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="solid"
+            color="primary"
             startDecorator={<PlusCircle size={16} />}
             onClick={navigateToCreateProject}
           >
@@ -286,25 +386,40 @@ export default function ProjectDetailPage() {
       {/* Project header */}
       <Card sx={{ mb: 3 }}>
         <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              mb: 2,
+            }}
+          >
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <Chip size="sm" variant="soft" color="primary">{projectData?._id}</Chip>
-                <Chip size="sm" variant="soft" color="success">Active</Chip>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
+                <Chip size="sm" variant="soft" color="primary">
+                  {projectData?._id}
+                </Chip>
+                <Chip size="sm" variant="soft" color="success">
+                  Active
+                </Chip>
               </Box>
-              <Typography level="h2" sx={{ mb: 1 }}>{projectData?.name}</Typography>
+              <Typography level="h2" sx={{ mb: 1 }}>
+                {projectData?.name}
+              </Typography>
             </Box>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button 
-                variant="outlined" 
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                variant="outlined"
                 color="danger"
                 startDecorator={<Trash2 size={16} />}
                 onClick={() => setDeleteModalOpen(true)}
               >
                 Delete Project
               </Button>
-              <Button 
-                variant="outlined" 
+              <Button
+                variant="outlined"
                 color="primary"
                 startDecorator={<UserPlus size={16} />}
                 onClick={() => setInviteModalOpen(true)}
@@ -313,13 +428,15 @@ export default function ProjectDetailPage() {
               </Button>
             </Box>
           </Box>
-          <Typography level="body-md" sx={{ mb: 2 }}>{projectData?.description}</Typography>
+          <Typography level="body-md" sx={{ mb: 2 }}>
+            {projectData?.description}
+          </Typography>
         </CardContent>
       </Card>
 
       {/* Main content tabs */}
-      <Tabs 
-        value={activeTab} 
+      <Tabs
+        value={activeTab}
         onChange={(_, value) => setActiveTab(value as number)}
         sx={{ mb: 3 }}
       >
@@ -329,7 +446,7 @@ export default function ProjectDetailPage() {
           <Tab>Members</Tab>
           <Tab>Settings</Tab>
         </TabList> */}
-        
+
         {/* <TabPanel value={0}>
           <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
             <Card sx={{ flex: '1 1 48%', minWidth: 300 }}>
@@ -415,7 +532,7 @@ export default function ProjectDetailPage() {
             </Card>
           </Box>
         </TabPanel> */}
-        
+
         {/* Boards Tab */}
         {/* <TabPanel value={1}>
           <Box>
@@ -495,7 +612,7 @@ export default function ProjectDetailPage() {
             </Grid>
           </Box>
         </TabPanel> */}
-        
+
         {/* Members Tab */}
         {/* <TabPanel value={2}>
           <Box>
@@ -586,9 +703,11 @@ export default function ProjectDetailPage() {
 
       {/* Invite user modal */}
       <Modal open={inviteModalOpen} onClose={() => setInviteModalOpen(false)}>
-        <ModalDialog sx={{ width: 400, maxWidth: '100%' }}>
+        <ModalDialog sx={{ width: 400, maxWidth: "100%" }}>
           <ModalClose />
-          <Typography level="h4" sx={{ mb: 2 }}>Invite Users to Project</Typography>
+          <Typography level="h4" sx={{ mb: 2 }}>
+            Invite Users to Project
+          </Typography>
           <Typography level="body-md" sx={{ mb: 3 }}>
             Enter email addresses of users you want to invite to this project.
           </Typography>
@@ -601,17 +720,17 @@ export default function ProjectDetailPage() {
               startDecorator={<Mail size={16} />}
               sx={{ mb: 2 }}
             />
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-              <Button 
-                variant="plain" 
-                color="neutral" 
+            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+              <Button
+                variant="plain"
+                color="neutral"
                 onClick={() => setInviteModalOpen(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                variant="solid" 
-                color="primary" 
+              <Button
+                variant="solid"
+                color="primary"
                 startDecorator={<UserPlus size={16} />}
                 onClick={handleInviteUser}
                 disabled={!inviteEmail.trim()}
@@ -624,30 +743,48 @@ export default function ProjectDetailPage() {
       </Modal>
 
       {/* Delete project confirmation modal */}
-      <Modal open={deleteModalOpen} onClose={() => !isDeleting && setDeleteModalOpen(false)}>
-        <ModalDialog sx={{ width: 400, maxWidth: '100%' }}>
+      <Modal
+        open={deleteModalOpen}
+        onClose={() => !isDeleting && setDeleteModalOpen(false)}
+      >
+        <ModalDialog sx={{ width: 400, maxWidth: "100%" }}>
           <ModalClose disabled={isDeleting} />
-          <Typography level="h4" sx={{ mb: 2, color: 'danger.500' }}>Delete Project</Typography>
-          <Typography level="body-md" sx={{ mb: 3 }}>
-            Are you sure you want to delete this project? This action cannot be undone and all project data will be permanently lost.
+          <Typography level="h4" sx={{ mb: 2, color: "danger.500" }}>
+            Delete Project
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-            <Button 
-              variant="plain" 
-              color="neutral" 
+          <Typography level="body-md" sx={{ mb: 3 }}>
+            Are you sure you want to delete this project? This action cannot be
+            undone and all project data will be permanently lost.
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+            <Button
+              variant="plain"
+              color="neutral"
               onClick={() => setDeleteModalOpen(false)}
               disabled={isDeleting}
             >
               Cancel
             </Button>
-            <Button 
-              variant="solid" 
-              color="danger" 
-              startDecorator={isDeleting ? <CircularProgress size="sm" /> : <Trash2 size={16} />}
-              onClick={handleDeleteProject}
+            <Button
+              variant="solid"
+              color="danger"
+              startDecorator={
+                isDeleting ? (
+                  <CircularProgress size="sm" />
+                ) : (
+                  <Trash2 size={16} />
+                )
+              }
+              onClick={() => {
+                if (projectData && projectData._id) {
+                  handleDeleteProject(projectData._id);
+                } else {
+                  console.error("Project ID is missing");
+                }
+              }}
               disabled={isDeleting}
             >
-              {isDeleting ? 'Deleting...' : 'Delete Project'}
+              {isDeleting ? "Deleting..." : "Delete Project"}
             </Button>
           </Box>
         </ModalDialog>
@@ -655,56 +792,81 @@ export default function ProjectDetailPage() {
 
       {/* New Task Modal */}
       <Modal open={newTaskModalOpen} onClose={() => setNewTaskModalOpen(false)}>
-        <ModalDialog sx={{ width: 500, maxWidth: '100%' }}>
+        <ModalDialog sx={{ width: 500, maxWidth: "100%" }}>
           <ModalClose />
-          <Typography level="h4" sx={{ mb: 2 }}>Add New Task</Typography>
-          <Typography level="body-md" sx={{ mb: 3 }}>
-            {selectedBoard !== null && `Adding task to ${projectData?.boards.find(b => b.id === selectedBoard)?.name}`}
+          <Typography level="h4" sx={{ mb: 2 }}>
+            Add New Task
           </Typography>
-          
+          <Typography level="body-md" sx={{ mb: 3 }}>
+            {selectedBoard !== null &&
+              `Adding task to ${
+                projectData?.boards.find((b) => b.id === selectedBoard)?.name
+              }`}
+          </Typography>
+
           <Box sx={{ mb: 3 }}>
             <Box sx={{ mb: 2 }}>
-              <Typography level="body-sm" sx={{ mb: 1 }}>Task Title</Typography>
+              <Typography level="body-sm" sx={{ mb: 1 }}>
+                Task Title
+              </Typography>
               <Input fullWidth placeholder="Enter task title" />
             </Box>
-            
+
             <Box sx={{ mb: 2 }}>
-              <Typography level="body-sm" sx={{ mb: 1 }}>Description</Typography>
+              <Typography level="body-sm" sx={{ mb: 1 }}>
+                Description
+              </Typography>
               {/* <Textarea fullWidth placeholder="Enter task description"  /> */}
             </Box>
-            
+
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid xs={6}>
-                <Typography level="body-sm" sx={{ mb: 1 }}>Assignee</Typography>
+                <Typography level="body-sm" sx={{ mb: 1 }}>
+                  Assignee
+                </Typography>
                 <Input fullWidth placeholder="Select assignee" />
               </Grid>
               <Grid xs={6}>
-                <Typography level="body-sm" sx={{ mb: 1 }}>Due Date</Typography>
+                <Typography level="body-sm" sx={{ mb: 1 }}>
+                  Due Date
+                </Typography>
                 <Input fullWidth type="date" />
               </Grid>
             </Grid>
-            
+
             <Box sx={{ mb: 2 }}>
-              <Typography level="body-sm" sx={{ mb: 1 }}>Priority</Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button variant="soft" color="success" sx={{ flex: 1 }}>Low</Button>
-                <Button variant="soft" color="warning" sx={{ flex: 1 }}>Medium</Button>
-                <Button variant="soft" color="danger" sx={{ flex: 1 }}>High</Button>
+              <Typography level="body-sm" sx={{ mb: 1 }}>
+                Priority
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button variant="soft" color="success" sx={{ flex: 1 }}>
+                  Low
+                </Button>
+                <Button variant="soft" color="warning" sx={{ flex: 1 }}>
+                  Medium
+                </Button>
+                <Button variant="soft" color="danger" sx={{ flex: 1 }}>
+                  High
+                </Button>
               </Box>
             </Box>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 3 }}>
-              <Button 
-                variant="plain" 
-                color="neutral" 
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 1,
+                mt: 3,
+              }}
+            >
+              <Button
+                variant="plain"
+                color="neutral"
                 onClick={() => setNewTaskModalOpen(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                variant="solid" 
-                color="primary"
-              >
+              <Button variant="solid" color="primary">
                 Add Task
               </Button>
             </Box>

@@ -59,3 +59,21 @@ export const useGetProjectById = (id: string) => {
         enabled: !!id,
     });
 };
+
+
+ const deleteProjectById = async (id: string): Promise<{ message: string }> => {
+    const { data } = await axios.delete(`http://localhost:5000/api/project/delete/${id}`);
+    return data;
+};
+
+export const useDeleteProject = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: deleteProjectById,
+        onSuccess: () => { 
+            queryClient.invalidateQueries({ queryKey: ["project"] });
+        },
+    });
+};
+
