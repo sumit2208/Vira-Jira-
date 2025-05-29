@@ -13,9 +13,10 @@ import {
 } from "@mui/joy";
 import { useForm, Controller } from "react-hook-form";
 import { Issue, useCreateIssue } from "../../../hook/issuehook";
-import { useGetProject} from "../../../hook/projecthook"
-
+import { useGetProject} from "../../../hook/projecthook"; 
+import { useRouter } from "next/navigation";
 const Page = () => {
+  const router = useRouter()
   const { mutate } = useCreateIssue();
   const {data} = useGetProject()
 
@@ -41,6 +42,7 @@ const Page = () => {
           type: "code",
           description: "",
         });
+        router.push("/issuepage")
       },
     });
   };

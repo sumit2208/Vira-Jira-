@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 export interface Issue {
-  id: string;
+  _id: string;
   title: string;
   priority: "High" | "Medium" | "Low";
   assignee: string;
@@ -26,6 +26,8 @@ export const useGetIssues = () => {
 };
 
 
+
+
 const createIssue = async (issue: Issue): Promise<Issue> => {
   const { data } = await axios.post("http://localhost:5000/api/issues/create", issue);
   return data;
@@ -39,5 +41,33 @@ export const useCreateIssue = () => {
     onSuccess: () => { 
       queryClient.invalidateQueries({ queryKey: ["issues"] });
     },
+  });
+};
+
+
+
+const DeleteIsuue = async (_id:string):Promise<{message:string}>=>{
+  const {data}= await axios.delete(`http://localhost:5000/api/issues/delete/${_id}`)
+  return data
+}
+
+export const useDeleteIsuue = ()=>{
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn:DeleteIsuue,
+    onSuccess:()=>[
+      queryClient.invalidateQueries({queryKey:["issues"]})
+    ]
+  })
+}
+
+export const useGetIssuesByProject = (projectName:string) => {
+  return useQuery({
+    queryKey: ["issues", projectName],
+    queryFn: async () => {
+      const res = await axios.get(`http://localhost:5000/api/issues/projectissue/${projectName}`);
+      return res.data;
+    },
+    enabled: !!projectName, // only run when projectName is not null
   });
 };

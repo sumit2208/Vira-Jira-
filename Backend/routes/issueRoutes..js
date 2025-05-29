@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { createIssue, getIssues } = require("../controllers/issueController");
+const { createIssue, getIssues, DeleteIssue , GetIssueByProject } = require("../controllers/issueController");
 
 router.post("/create", createIssue);
 router.get("/get", getIssues);
+router.delete("/delete/:id",DeleteIssue)
+router.get("/projectissue/:ProjectName",GetIssueByProject)
 
-module.exports = router;
+module.exports = router; 

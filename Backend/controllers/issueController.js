@@ -1,23 +1,46 @@
-const issue = require("../models/issue")
+const issue = require("../models/issue");
 
-
-const createIssue = async (req,res)=>{
-    try{
-        const newIssue = new issue(req.body);
-        await newIssue.save();
-        res.status(201).json(newIssue)
-    }catch (err) {
-        res.status(500).json({ error: err.message });
-      }
-}
+const createIssue = async (req, res) => {
+  try {
+    const newIssue = new issue(req.body);
+    await newIssue.save();
+    res.status(201).json(newIssue);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 const getIssues = async (req, res) => {
-    try {
-      const issues = await issue.find();
-      res.status(200).json(issues);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+  try {
+    const issues = await issue.find();
+    res.status(200).json(issues);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const DeleteIssue = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteIsuue = await issue.findByIdAndDelete(id);
+    if (!deleteIsuue) {
+      return res.status(404).json({ message: "Project Not Found" });
     }
-  };
-  
-  module.exports = { createIssue, getIssues };
+    res
+      .status(200)
+      .json({ message: "Isuue deleted successfully", deleteIsuue });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const GetIssueByProject = async (req,res)=>{
+  try{
+    const {ProjectName} = req.params;
+    const Fetch = await issue.find({project:ProjectName})
+    res.status(200).json(Fetch);
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+module.exports = { createIssue, getIssues, DeleteIssue , GetIssueByProject };

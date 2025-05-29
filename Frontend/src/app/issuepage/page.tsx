@@ -18,12 +18,12 @@ import {
 } from "@mui/joy";
 import Link from "next/link";
 import React, { useState } from "react";
-import { Filter, Bug, FileCode, FileText } from "lucide-react";
-import { useGetIssues } from "../../hook/issuehook";
+import { Filter, Bug, FileCode, FileText, Delete, DeleteIcon, Trash } from "lucide-react";
+import { useGetIssues , useDeleteIsuue } from "../../hook/issuehook";
 
 // Define TypeScript interfaces for our data
 interface Issue {
-  id: string;
+  _id: string;
   title: string;
   priority: "High" | "Medium" | "Low";
   assignee: string;
@@ -34,21 +34,13 @@ interface Issue {
 
 type PriorityColor = "danger" | "warning" | "success" | "neutral";
 
-const IssuePage = () => {
-  const [tabValue, setTabValue] = useState(0);
+const IssuePage = () => { 
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const { data: issues = [], isLoading, isError } = useGetIssues();
+  const { data: Issue = [], isLoading, isError } = useGetIssues();
+  const {mutate:deleteissue} = useDeleteIsuue( )
 
-  // Fixed the event handler type to match MUI Joy's Tabs component expectations
-  const handleTabChange = (
-    event: React.SyntheticEvent | null,
-    newValue: string | number | null
-  ) => {
-    if (typeof newValue === "number") {
-      setTabValue(newValue);
-    }
-  };
+ 
 
   const handleFilterOpen = () => setFilterOpen(true);
   const handleFilterClose = () => setFilterOpen(false);
@@ -65,6 +57,11 @@ const IssuePage = () => {
         return <FileText size={16} />;
     }
   };
+
+  const HandleDeleteissue = (_id:string)=>{
+    deleteissue(_id);
+     
+  }
 
   const renderPriorityBadge = (priority: Issue["priority"]) => {
     let color: PriorityColor = "neutral";
@@ -207,7 +204,7 @@ const IssuePage = () => {
       </Modal>
 
       <Typography level="body-sm" sx={{ color: "text.secondary", mb: 2 }}>
-        Showing {issues.length} {issues.length === 1 ? "issue" : "issues"}
+        Showing {Issue.length} {Issue.length === 1 ? "issue" : "issues"}
       </Typography>
 
       <Sheet
@@ -234,24 +231,17 @@ const IssuePage = () => {
         >
           <thead>
             <tr>
-              <th style={{ width: "80px" }}>ID</th>
               <th>Title</th>
               <th style={{ width: "100px" }}>Projects</th>
               <th style={{ width: "100px" }}>Priority</th>
               <th style={{ width: "120px" }}>Assignee</th>
+              <th style={{ width: "80px" }}>Delete</th>
             </tr>
           </thead>
           <tbody>
-            {issues.map((issue, index) => (
-              <tr key={issue.id || index}>
-                <td>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {getIssueIcon(issue.type)}
-                    <Typography level="body-sm" fontWeight="md">
-                      {issue.id}
-                    </Typography>
-                  </Box>
-                </td>
+            {Issue.map((issue, index) => (
+              <tr key={issue._id || index}>
+                
                 <td>
                   <Typography level="body-sm">{issue.title}</Typography>
                 </td>
@@ -261,6 +251,11 @@ const IssuePage = () => {
                 <td>{renderPriorityBadge(issue.priority)}</td>
                 <td>
                   <Typography level="body-sm">{issue.assignee}</Typography>
+                </td>
+                <td onClick={()=>HandleDeleteissue(issue._id)}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Trash color="red"/>
+                  </Box>
                 </td>
               </tr>
             ))}

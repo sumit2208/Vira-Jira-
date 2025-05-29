@@ -49,7 +49,7 @@ const ProjectCreationPage = () => {
         onSuccess: () => {
             alert("Project created successfully!");
             reset(formData);
-            router.push("./projectt");
+            router.push("/projectt");
         },
         onError: (error) => {
             console.error("Failed to create project:", error);
