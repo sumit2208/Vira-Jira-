@@ -1,10 +1,8 @@
 "use client"
 import React from "react";
-import Sidebar from "@/components/Sidebar"; 
-import { redirect } from "next/navigation";
+import Sidebar from "@/components/Sidebar";  
 
-const Page = () => {
-  redirect("/dashborad");
+const Page = () => { 
   return (
     <>
       <Sidebar /> 

@@ -56,28 +56,14 @@ import {
 } from "lucide-react";
 import { useGetIssuesByProject } from "@/hook/issuehook";
 
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar: string;
-}
-
-interface Task {
-  id: string;
+interface Issue {
+  _id: string;
   title: string;
   description: string;
-  assignee: string;
-  dueDate: string;
+  status: "todo" | "in-progress" | "review" | "done";
   priority: "low" | "medium" | "high";
-}
-
-interface Board {
-  id: number;
-  name: string;
-  status: string;
-  tasks?: Task[];
+  assignee?: string;
+  createdAt: string;
 }
 
 interface ProjectData {
@@ -85,9 +71,9 @@ interface ProjectData {
   name: string;
   description: string;
   type: string;
+  members: string[];
   createdAt: string;
-  members: Member[];
-  boards: Board[];
+  project_key: string;
 }
 
 export default function ProjectDetailPage() {
@@ -103,14 +89,77 @@ export default function ProjectDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
   const [selectedBoard, setSelectedBoard] = useState<number | null>(null);
+  const [draggedIssue, setDraggedIssue] = useState<Issue | null>(null);
+  const [issues, setIssues] = useState<Issue[]>([]);
 
   const { mutate: deleteProject } = useDeleteProject();
-  
+  const { data } = useGetIssuesByProject(projectData?.name || "");
 
-  
-  
   useEffect(() => {
-    // Fetch project data based on the ID
+    if (data) {
+      // Map your data to the Issue interface format
+      const mappedIssues = data.map((issue: any) => ({
+        _id: issue._id,
+        title: issue.title || issue.name || "Untitled Issue",
+        description: issue.description || "",
+        status: issue.status || "todo",
+        priority: issue.priority || "medium",
+        assignee: issue.assignee,
+        createdAt: issue.createdAt,
+      }));
+      setIssues(mappedIssues);
+    }
+  }, [data]);
+
+  const columns = [
+    { id: "todo", title: "To Do", color: "neutral" },
+    { id: "in-progress", title: "In Progress", color: "primary" },
+    { id: "review", title: "Review", color: "warning" },
+    { id: "done", title: "Done", color: "success" },
+  ];
+
+  const handleDragStart = (e: React.DragEvent, issue: Issue) => {
+    setDraggedIssue(issue);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent, newStatus: string) => {
+    e.preventDefault();
+    if (draggedIssue && draggedIssue.status !== newStatus) {
+      setIssues((prev) =>
+        prev.map((issue) =>
+          issue._id === draggedIssue._id
+            ? { ...issue, status: newStatus as Issue["status"] }
+            : issue
+        )
+      );
+    }
+    setDraggedIssue(null);
+  };
+
+  const getIssuesByStatus = (status: string) => {
+    return issues.filter((issue) => issue.status === status);
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "danger";
+      case "medium":
+        return "warning";
+      case "low":
+        return "success";
+      default:
+        return "neutral";
+    }
+  };
+
+  useEffect(() => {
     async function fetchProject() {
       try {
         const response = await fetch(
@@ -148,15 +197,12 @@ export default function ProjectDetailPage() {
   const navigateToCreateProject = () => {
     router.push("/projectt/createproject");
   };
-  
+
   const navigateToAllProjects = () => {
     router.push("/projectt");
   };
-const { data } = useGetIssuesByProject(projectData?.name || "");
-  console.log(data)
 
-  
-  
+  console.log(data);
 
   if (loading) {
     return (
@@ -267,8 +313,193 @@ const { data } = useGetIssuesByProject(projectData?.name || "");
             </Box>
           </Box>
           <Typography level="body-md" sx={{ mb: 2 }}>
-            {projectData?.description}
+            {projectData?.project_key}
           </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {projectData?.members && projectData.members.length > 0 ? (
+              <>
+                <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>
+                  {projectData.members
+                    .slice(0, 3)
+                    .map((member: any, index: number) => (
+                      <Avatar
+                        key={member._id || index}
+                        size="sm"
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          ml: index > 0 ? -1 : 0,
+                          border: "2px solid",
+                          borderColor: "background.surface",
+                          zIndex: 3 - index,
+                        }}
+                      >
+                        {member ? member.charAt(0).toUpperCase() : "Z"}
+                      </Avatar>
+                    ))}
+                  {projectData.members.length > 3 && (
+                    <Avatar
+                      size="sm"
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        ml: -1,
+                        border: "2px solid",
+                        borderColor: "background.surface",
+                        bgcolor: "neutral.softBg",
+                        color: "neutral.softColor",
+                      }}
+                    >
+                      +{projectData.members.length - 3}
+                    </Avatar>
+                  )}
+                </Box>
+                <Typography level="body-sm" sx={{ color: "text.secondary" }}>
+                  {projectData.members.length} member
+                  {projectData.members.length !== 1 ? "s" : ""}
+                </Typography>
+              </>
+            ) : (
+              <Typography level="body-sm" sx={{ color: "text.secondary" }}>
+                No members yet
+              </Typography>
+            )}
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* Issue Board */}
+      <Card>
+        <CardContent sx={{ p: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
+          >
+            <Typography level="h3">Issue Board</Typography>
+            <Button
+              variant="solid"
+              color="primary"
+              startDecorator={<Plus size={16} />}
+              onClick={() => setNewTaskModalOpen(true)}
+            >
+              Add Issue
+            </Button>
+          </Box>
+
+          <Grid container spacing={2} sx={{ minHeight: "500px" }}>
+            {columns.map((column) => (
+              <Grid xs={3} key={column.id}>
+                <Card
+                  variant="outlined"
+                  sx={{ height: "100%", minHeight: "500px" }}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, column.id)}
+                >
+                  <CardContent sx={{ p: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography level="title-md" sx={{ fontWeight: "bold" }}>
+                        {column.title}
+                      </Typography>
+                      <Chip
+                        size="sm"
+                        variant="soft"
+                        color={column.color as any}
+                      >
+                        {getIssuesByStatus(column.id).length}
+                      </Chip>
+                    </Box>
+
+                    <Stack spacing={2}>
+                      {getIssuesByStatus(column.id).map((issue) => (
+                        <Card
+                          key={issue._id}
+                          variant="soft"
+                          sx={{
+                            cursor: "grab",
+                            "&:active": { cursor: "grabbing" },
+                            "&:hover": { bgcolor: "background.level2" },
+                          }}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, issue)}
+                        >
+                          <CardContent sx={{ p: 2 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                mb: 1,
+                              }}
+                            >
+                              <Typography
+                                level="title-sm"
+                                sx={{ fontWeight: "bold", flex: 1 }}
+                              >
+                                {issue.title}
+                              </Typography>
+                              <Chip
+                                size="sm"
+                                variant="soft"
+                                color={getPriorityColor(issue.priority) as any}
+                              >
+                                {issue.priority}
+                              </Chip>
+                            </Box>
+
+                            {issue.description && (
+                              <Typography
+                                level="body-xs"
+                                sx={{ mb: 2, color: "text.secondary" }}
+                              >
+                                {issue.description.length > 100
+                                  ? `${issue.description.substring(0, 100)}...`
+                                  : issue.description}
+                              </Typography>
+                            )}
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mt: 1,
+                              }}
+                            >
+                              {issue.assignee && (
+                                <Avatar
+                                  size="sm"
+                                  sx={{ width: 24, height: 24 }}
+                                >
+                                  {issue.assignee.charAt(0).toUpperCase()}
+                                </Avatar>
+                              )}
+                              <Typography
+                                level="body-xs"
+                                sx={{ color: "text.tertiary" }}
+                              >
+                                {new Date(issue.createdAt).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         </CardContent>
       </Card>
 
@@ -367,12 +598,6 @@ const { data } = useGetIssuesByProject(projectData?.name || "");
           <ModalClose />
           <Typography level="h4" sx={{ mb: 2 }}>
             Add New Task
-          </Typography>
-          <Typography level="body-md" sx={{ mb: 3 }}>
-            {selectedBoard !== null &&
-              `Adding task to ${
-                projectData?.boards.find((b) => b.id === selectedBoard)?.name
-              }`}
           </Typography>
 
           <Box sx={{ mb: 3 }}>

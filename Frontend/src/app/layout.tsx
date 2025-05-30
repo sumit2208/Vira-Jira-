@@ -33,11 +33,11 @@ export default function RootLayout({
           </SignedOut> 
           <SignedIn>
             <Providers>
-            <div className="flex"> 
+            <div className="flex gap-2"> 
               <div className="w-64"> 
                  <Sidebar/>
               </div> 
-              <main className="flex-1   p-4">{children}</main>
+              <main className="flex-1 ">{children}</main>
             </div>
             </Providers>
           </SignedIn>

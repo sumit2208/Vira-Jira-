@@ -15,7 +15,11 @@ const issueSchema = new mongoose.Schema({
     type: String,
     enum: ["bug", "code", "doc"],
     default: "doc"
-  }
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 }, { collection: "vira" }); // 👈 Explicitly set collection name
 
 module.exports = mongoose.model("vira", issueSchema);
