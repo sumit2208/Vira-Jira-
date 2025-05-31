@@ -1,11 +1,11 @@
 "use client"
 import React from "react";
-import Sidebar from "@/components/Sidebar";  
+// import Sidebar from "@/components/Sidebar";  
 
 const Page = () => { 
   return (
     <>
-      <Sidebar /> 
+      {/* <Sidebar />  */}
        
     </>
   );

@@ -23,7 +23,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile toggle button - only show on mobile */}
-      <div className="lg:hidden">
+      <div className="lg:hidden  ">
         <Button
           onClick={() => setIsOpen(!isOpen)}
           className="fixed top-4 left-4 z-50 bg-gray-800 hover:bg-gray-700 border border-gray-600 transition-all duration-300 shadow-lg"
@@ -53,6 +53,7 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div
         className={`
+          
           fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900
           border-r border-gray-700/50 backdrop-blur-xl z-50
           transform transition-transform duration-300 ease-out
@@ -79,7 +80,7 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 pr-10">
           {navItems.map((item, index) => {
             const Icon = item.icon;
             return (

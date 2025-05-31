@@ -1,59 +1,25 @@
-"use client";
-import { useSearchParams } from "next/navigation";
+"use client";;
 import { useEffect, useState } from "react";
 import { useRouter as useNextRouter, useParams } from "next/navigation";
-import { useDeleteProject } from "@/hook/projecthook";
+import { useDeleteProject, useInviteMember } from "@/hook/projecthook";
 import {
   Box,
   Typography,
-  Sheet,
   Card,
   CardContent,
   Button,
   IconButton,
-  Divider,
   Chip,
   Avatar,
   Modal,
   ModalDialog,
   ModalClose,
   Input,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanel,
-  List,
-  ListItem,
-  ListItemContent,
-  ListItemDecorator,
   CircularProgress,
   Grid,
-  AspectRatio,
   Stack,
-  Badge,
-  Textarea,
 } from "@mui/joy";
-import {
-  Users,
-  Trash2,
-  Mail,
-  ArrowLeft,
-  UserPlus,
-  Settings,
-  PlusCircle,
-  Activity,
-  Calendar,
-  Grid as GridIcon,
-  HelpCircle,
-  Search,
-  MessageSquare,
-  MoreVertical,
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  Edit,
-  Plus,
-} from "lucide-react";
+import { Trash2, Mail, ArrowLeft, UserPlus, Settings, PlusCircle } from "lucide-react";
 import { useGetIssuesByProject } from "@/hook/issuehook";
 
 interface Issue {
@@ -84,6 +50,8 @@ export default function ProjectDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteStatus, setInviteStatus] = useState<{ type: "success" | "error" | null; message: string | null }>({ type: null, message: null });
+  const [isInviting, setIsInviting] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -93,6 +61,7 @@ export default function ProjectDetailPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
 
   const { mutate: deleteProject } = useDeleteProject();
+  const { mutate: inviteMember } = useInviteMember();
   const { data } = useGetIssuesByProject(projectData?.name || "");
 
   useEffect(() => {
@@ -179,9 +148,36 @@ export default function ProjectDetailPage() {
   }, [id]);
 
   const handleInviteUser = () => {
-    console.log("Inviting user:", inviteEmail);
-    setInviteEmail("");
-    setInviteModalOpen(false);
+    if (!inviteEmail.trim() || !id) return;
+    
+    setIsInviting(true);
+    setInviteStatus({ type: null, message: null });
+    
+    inviteMember(
+      { projectId: id as string, email: inviteEmail },
+      {
+        onSuccess: (data) => {
+          setInviteStatus({ 
+            type: "success", 
+            message: "Invitation sent successfully! An email has been sent to the user with project details." 
+          });
+          setInviteEmail("");
+          // Refresh project data to show the new member
+          setTimeout(() => {
+            setInviteModalOpen(false);
+            setInviteStatus({ type: null, message: null });
+            setIsInviting(false);
+          }, 2500); // Increased timeout to give user more time to read the message
+        },
+        onError: (error: any) => {
+          setInviteStatus({ 
+            type: "error", 
+            message: error.response?.data?.message || "Failed to send invitation. Please try again." 
+          });
+          setIsInviting(false);
+        }
+      }
+    );
   };
 
   const handleDeleteProject = (_id: string) => {
@@ -380,14 +376,7 @@ export default function ProjectDetailPage() {
             }}
           >
             <Typography level="h3">Issue Board</Typography>
-            <Button
-              variant="solid"
-              color="primary"
-              startDecorator={<Plus size={16} />}
-              onClick={() => setNewTaskModalOpen(true)}
-            >
-              Add Issue
-            </Button>
+            
           </Box>
 
           <Grid container spacing={2} sx={{ minHeight: "500px" }}>
@@ -521,23 +510,44 @@ export default function ProjectDetailPage() {
               onChange={(e) => setInviteEmail(e.target.value)}
               startDecorator={<Mail size={16} />}
               sx={{ mb: 2 }}
+              disabled={isInviting}
             />
+            
+            {inviteStatus.message && (
+              <Typography 
+                level="body-sm" 
+                sx={{ 
+                  mb: 2, 
+                  color: inviteStatus.type === "success" ? "success.500" : "danger.500",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1
+                }}
+              >
+                {inviteStatus.type === "success" ? "✓" : "✗"} {inviteStatus.message}
+              </Typography>
+            )}
+            
             <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
               <Button
                 variant="plain"
                 color="neutral"
-                onClick={() => setInviteModalOpen(false)}
+                onClick={() => {
+                  setInviteModalOpen(false);
+                  setInviteStatus({ type: null, message: null });
+                }}
+                disabled={isInviting}
               >
                 Cancel
               </Button>
               <Button
                 variant="solid"
                 color="primary"
-                startDecorator={<UserPlus size={16} />}
+                startDecorator={isInviting ? <CircularProgress size="sm" /> : <UserPlus size={16} />}
                 onClick={handleInviteUser}
-                disabled={!inviteEmail.trim()}
+                disabled={!inviteEmail.trim() || isInviting}
               >
-                Send Invitation
+                {isInviting ? "Sending..." : "Send Invitation"}
               </Button>
             </Box>
           </Box>
