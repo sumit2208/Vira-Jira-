@@ -37,7 +37,7 @@ export default function RootLayout({
               <div className="w-64"> 
                  <Sidebar/>
               </div> 
-              <main className="flex-1 ">{children}</main>
+              <main className="flex-1 max-h-max px-8">{children}</main>
             </div>
             </Providers>
           </SignedIn>

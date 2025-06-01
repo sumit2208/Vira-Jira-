@@ -88,7 +88,7 @@ const IssuePage = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: "1200px", mx: "auto" }}>
+    <Box sx={{ p: 3, maxWidth: "1200px", mx: "auto", height:"100vh"}}>
       <Box
         sx={{
           display: "flex",
