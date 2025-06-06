@@ -1,6 +1,24 @@
 const Project = require("../models/project");
 const emailService = require("../services/emailService");
 
+
+// controllers/projectController.js
+const getProjectsForUser = async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+
+    if (!userEmail) {
+      return res.status(400).json({ message: "User email is required" });
+    }
+
+    const projects = await Project.find({ members: userEmail });
+    res.status(200).json(projects);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 // Add a member to a project
 const addMemberToProject = async (req, res) => {
     try {
@@ -93,4 +111,4 @@ const DeleteProjectById = async (req, res) => {
 
 
 
-module.exports = { createProject, allProject, ProjectById, DeleteProjectById, addMemberToProject };
+module.exports = { createProject, allProject, ProjectById, DeleteProjectById, addMemberToProject, getProjectsForUser };

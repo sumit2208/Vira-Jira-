@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -39,12 +39,40 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useGetProject } from "@/hook/projecthook";
+import { useUser } from "@clerk/nextjs";
+import axios from "axios";
 
 const ProjectsPage = () => {
   const router = useRouter();
   const { data, isLoading } = useGetProject();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+
+  const { user } = useUser();
+  const [projects, setProjects] = useState([]);
+
+ 
+
+   useEffect(() => {
+    const fetchProjects = async () => {
+      if (user?.primaryEmailAddress?.emailAddress) {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/project/user-projects`,
+            {
+              params: { email: user.primaryEmailAddress.emailAddress },
+            }
+          );
+          setProjects(response.data);
+        } catch (err) {
+          console.error("Error fetching user projects:", err);
+        }
+      }
+    };
+
+    fetchProjects();
+  }, [user]);
+  
 
   // Filter and search projects
   const filteredProjects = useMemo(() => {
