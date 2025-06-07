@@ -14,11 +14,11 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { Issue, useCreateIssue } from "../../../hook/issuehook";
 import { useGetProject} from "../../../hook/projecthook"; 
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; 
 const Page = () => {
   const router = useRouter()
   const { mutate } = useCreateIssue();
-  const {data} = useGetProject()
+  const {data} = useGetProject() 
 
   const { handleSubmit, control,reset  } = useForm<Issue>({
     defaultValues: {
@@ -156,28 +156,7 @@ const Page = () => {
           />
         </FormControl>
 
-        {/* Assignee */}
-        <Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <FormControl>
-            <FormLabel>Assignee</FormLabel>
-            <Controller
-              name="assignee"
-              control={control}
-              render={({ field }) => (
-                <Select
-                value={field.value}
-                onChange={(_, value) => field.onChange(value)}
-                  startDecorator={<User size={16} />}
-                  className="bg-[#F8F8F7]"
-                  placeholder="Select team member"
-                >
-                  <Option value="user1">User 1</Option>
-                  <Option value="user2">User 2</Option>
-                </Select>
-              )}
-            />
-          </FormControl>
-        </Box>
+         
 
         {/* Due Date (Optional) */}
         <Box className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

@@ -12,4 +12,4 @@ const createMembers = async (req,res)=>{
 
 
 
-module.exports={createMembers}
+module.exports={createMembers};

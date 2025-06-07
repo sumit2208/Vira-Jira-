@@ -233,8 +233,7 @@ const IssuePage = () => {
             <tr>
               <th>Title</th>
               <th style={{ width: "100px" }}>Projects</th>
-              <th style={{ width: "100px" }}>Priority</th>
-              <th style={{ width: "120px" }}>Assignee</th>
+              <th style={{ width: "100px" }}>Priority</th> 
               <th style={{ width: "80px" }}>Delete</th>
             </tr>
           </thead>
@@ -249,9 +248,7 @@ const IssuePage = () => {
                   <Typography level="body-sm">{issue.project}</Typography>
                 </td>
                 <td>{renderPriorityBadge(issue.priority)}</td>
-                <td>
-                  <Typography level="body-sm">{issue.assignee}</Typography>
-                </td>
+                 
                 <td onClick={()=>HandleDeleteissue(issue._id)}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Trash color="red"/>

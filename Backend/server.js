@@ -3,7 +3,7 @@ const cors = require("cors");
 const db = require("./config/db");
 const issueRoutes = require("./routes/issueRoutes.");
 const projectRoutes = require("./routes/projectRoutes");
-const membersRoutes = require("./routes/memberRoutes")
+const memberRoutes = require("./routes/memberRoutes")
 require("dotenv").config();
 
 const app = express();
@@ -17,7 +17,7 @@ db();
 
 app.use("/api/issues", issueRoutes);
 app.use("/api/project", projectRoutes);
-app.use("api/member",membersRoutes)
+app.use("/api/member",memberRoutes)
 
 
 const PORT = process.env.PORT || 5000;

@@ -3,4 +3,8 @@ const router = express.Router()
 
 const {createMembers} = require("../controllers/membersController")
 
-router.post("/create",createMembers)
+router.post("/createMembers",createMembers)
+
+
+
+module.exports = router;
