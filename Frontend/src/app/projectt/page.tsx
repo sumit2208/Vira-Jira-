@@ -42,6 +42,17 @@ import { useGetProject } from "@/hook/projecthook";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 
+
+interface project {
+    _id:string,
+    name:string,
+    description:string,
+    project_key:string,
+    members: string[],
+    createdAt:string
+}
+
+
 const ProjectsPage = () => {
   const router = useRouter();
   const { data, isLoading } = useGetProject();
@@ -49,7 +60,7 @@ const ProjectsPage = () => {
   const [selectedFilter, setSelectedFilter] = useState("all");
 
   const { user } = useUser();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<project[]>([]);
 
  
 
@@ -76,9 +87,9 @@ const ProjectsPage = () => {
 
   // Filter and search projects
   const filteredProjects = useMemo(() => {
-    if (!data) return [];
+    if (!projects) return [];
 
-    return data.filter((project) => {
+    return projects.filter((project) => {
       const matchesSearch =
         project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         project.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -86,7 +97,7 @@ const ProjectsPage = () => {
       // Add more filter logic here based on selectedFilter
       return matchesSearch;
     });
-  }, [data, searchQuery, selectedFilter]);
+  }, [projects, searchQuery, selectedFilter]);
 
   const handleCreateProject = () => {
     router.push("/projectt/createproject");
@@ -393,7 +404,7 @@ const ProjectsPage = () => {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <Briefcase size={24} />
                   <Box>
-                    <Typography level="h3">{data?.length || 0}</Typography>
+                    <Typography level="h3">{projects?.length || 0}</Typography>
                     <Typography level="body-sm">Total Projects</Typography>
                   </Box>
                 </Box>
@@ -407,7 +418,7 @@ const ProjectsPage = () => {
                   <Activity size={24} />
                   <Box>
                     <Typography level="h3">
-                      {data?.filter((p) => p.members?.length > 0).length || 0}
+                      {projects?.filter((p) => p.members?.length > 0).length || 0}
                     </Typography>
                     <Typography level="body-sm">Active Projects</Typography>
                   </Box>
@@ -422,7 +433,7 @@ const ProjectsPage = () => {
                   <Users size={24} />
                   <Box>
                     <Typography level="h3">
-                      {data?.reduce(
+                      {projects?.reduce(
                         (acc, project) => acc + (project.members?.length || 0),
                         0
                       ) || 0}

@@ -1,7 +1,7 @@
-"use client";;
+"use client";
 import { useEffect, useState } from "react";
 import { useRouter as useNextRouter, useParams } from "next/navigation";
-import { useDeleteProject, useInviteMember } from "@/hook/projecthook";
+import { useDeleteProject, useInviteMember, } from "@/hook/projecthook";
 import {
   Box,
   Typography,
@@ -17,9 +17,17 @@ import {
   Input,
   CircularProgress,
   Grid,
-  Stack,
+  Stack, 
+  Select, Option, FormControl, FormLabel
 } from "@mui/joy";
-import { Trash2, Mail, ArrowLeft, UserPlus, Settings, PlusCircle } from "lucide-react";
+import {
+  Trash2,
+  Mail,
+  ArrowLeft,
+  UserPlus,
+  Settings,
+  PlusCircle,
+} from "lucide-react";
 import { useGetIssuesByProject } from "@/hook/issuehook";
 
 interface Issue {
@@ -50,7 +58,10 @@ export default function ProjectDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteStatus, setInviteStatus] = useState<{ type: "success" | "error" | null; message: string | null }>({ type: null, message: null });
+  const [inviteStatus, setInviteStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string | null;
+  }>({ type: null, message: null });
   const [isInviting, setIsInviting] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -59,6 +70,7 @@ export default function ProjectDetailPage() {
   const [selectedBoard, setSelectedBoard] = useState<number | null>(null);
   const [draggedIssue, setDraggedIssue] = useState<Issue | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [role, setrole] = useState("");
 
   const { mutate: deleteProject } = useDeleteProject();
   const { mutate: inviteMember } = useInviteMember();
@@ -149,17 +161,18 @@ export default function ProjectDetailPage() {
 
   const handleInviteUser = () => {
     if (!inviteEmail.trim() || !id) return;
-    
+
     setIsInviting(true);
     setInviteStatus({ type: null, message: null });
-    
+
     inviteMember(
       { projectId: id as string, email: inviteEmail },
       {
         onSuccess: (data) => {
-          setInviteStatus({ 
-            type: "success", 
-            message: "Invitation sent successfully! An email has been sent to the user with project details." 
+          setInviteStatus({
+            type: "success",
+            message:
+              "Invitation sent successfully! An email has been sent to the user with project details.",
           });
           setInviteEmail("");
           // Refresh project data to show the new member
@@ -170,12 +183,14 @@ export default function ProjectDetailPage() {
           }, 2500); // Increased timeout to give user more time to read the message
         },
         onError: (error: any) => {
-          setInviteStatus({ 
-            type: "error", 
-            message: error.response?.data?.message || "Failed to send invitation. Please try again." 
+          setInviteStatus({
+            type: "error",
+            message:
+              error.response?.data?.message ||
+              "Failed to send invitation. Please try again.",
           });
           setIsInviting(false);
-        }
+        },
       }
     );
   };
@@ -376,7 +391,6 @@ export default function ProjectDetailPage() {
             }}
           >
             <Typography level="h3">Issue Board</Typography>
-            
           </Box>
 
           <Grid container spacing={2} sx={{ minHeight: "500px" }}>
@@ -511,23 +525,37 @@ export default function ProjectDetailPage() {
               startDecorator={<Mail size={16} />}
               sx={{ mb: 2 }}
               disabled={isInviting}
-            />
-            
+            /> 
+            <FormLabel>Role</FormLabel>
+      <Select
+        value={role}
+        onChange={(e, newValue) => setrole(newValue || "member")}
+        placeholder="Select role"
+        variant="soft"
+      >
+        <Option value="member">Member</Option>
+        <Option value="admin">Admin</Option>
+      </Select>
+
             {inviteStatus.message && (
-              <Typography 
-                level="body-sm" 
-                sx={{ 
-                  mb: 2, 
-                  color: inviteStatus.type === "success" ? "success.500" : "danger.500",
+              <Typography
+                level="body-sm"
+                sx={{
+                  mb: 2,
+                  color:
+                    inviteStatus.type === "success"
+                      ? "success.500"
+                      : "danger.500",
                   display: "flex",
                   alignItems: "center",
-                  gap: 1
+                  gap: 1,
                 }}
               >
-                {inviteStatus.type === "success" ? "✓" : "✗"} {inviteStatus.message}
+                {inviteStatus.type === "success" ? "✓" : "✗"}{" "}
+                {inviteStatus.message}
               </Typography>
             )}
-            
+
             <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
               <Button
                 variant="plain"
@@ -543,7 +571,13 @@ export default function ProjectDetailPage() {
               <Button
                 variant="solid"
                 color="primary"
-                startDecorator={isInviting ? <CircularProgress size="sm" /> : <UserPlus size={16} />}
+                startDecorator={
+                  isInviting ? (
+                    <CircularProgress size="sm" />
+                  ) : (
+                    <UserPlus size={16} />
+                  )
+                }
                 onClick={handleInviteUser}
                 disabled={!inviteEmail.trim() || isInviting}
               >

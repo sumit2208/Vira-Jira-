@@ -78,7 +78,7 @@ export const useDeleteProject = () => {
 };
 
 // Invite member to project
-const inviteMemberToProject = async ({ projectId, email }: { projectId: string, email: string }): Promise<{ message: string, project: project }> => {
+const inviteMemberToProject = async ({ projectId, email }: { projectId: string, email: string}): Promise<{ message: string, project: project }> => {
     const { data } = await axios.post(`http://localhost:5000/api/project/project/${projectId}/invite`, { email }, {
         headers: {
             "Content-Type": "application/json",

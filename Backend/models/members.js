@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const MemberSchema = new Schema({
-  userId: {
-    type: String, // Clerk user ID
+  UserEmail: {
+    type: String, // Clerk user Email
     required: true,
   },
   role: {
     type: String,
-    enum: ["admin", "editor", "viewer"],
-    default: "viewer",
+    enum: ["admin",  "User"],
+    default: "User",
   },
   invitedBy: {
     type: String, // Clerk user ID of inviter
@@ -18,6 +18,6 @@ const MemberSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-});
+},{ collection: "members" });
 
-module.exports = MemberSchema; // not a model yet
+module.exports = mongoose.model("members",MemberSchema); 
