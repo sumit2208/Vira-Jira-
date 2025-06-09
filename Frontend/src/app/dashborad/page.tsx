@@ -29,6 +29,8 @@ import { useGetIssues } from "../../hook/issuehook";
 const page = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState("Last 30 days");
   const [activeTab, setActiveTab] = useState("overview");
+  // 🔥 ADD THIS: State for export dropdown
+  const [showExportOptions, setShowExportOptions] = useState(false);
 
   const { data: Issue, isLoading: IssueLoading, isError } = useGetIssues();
   const { data: Project, isLoading: ProjectLoading } = useGetProject();
@@ -41,7 +43,6 @@ const page = () => {
 
   Issue?.forEach((issue) => {
     // @ts-ignore
-
     issueTypeCount[issue.type] = (issueTypeCount[issue.type] || 0) + 1;
   });
 
@@ -49,7 +50,6 @@ const page = () => {
   const IssueValue = Object.keys(issueTypeCount).map((type, index) => ({
     type,
     // @ts-ignore
-
     count: issueTypeCount[type],
     color: getTypeColor(type, index),
     gradient: getTypeGradient(type, index),
@@ -64,6 +64,97 @@ const page = () => {
     "Last 3 months",
     "Last year",
   ];
+
+  // 🔥 ADD THESE EXPORT FUNCTIONS HERE (after your existing variables)
+  
+  // Export as JSON
+  const exportToJSON = () => {
+    const dashboardData = {
+      metadata: {
+        exportDate: new Date().toISOString(),
+        timeRange: selectedTimeRange,
+        totalProjects: ProjectLength,
+        totalIssues: IssueLength,
+      },
+      projects: ProjectValue.map(project => ({
+        name: project.name,
+        status: "Active",
+        progress: Math.floor(Math.random() * 40 + 40) + "%"
+      })),
+      issues: {
+        breakdown: IssueValue,
+        total: IssueLength,
+      },
+      metrics: {
+        resolutionTime: "2.4 days",
+        teamProductivity: "94%",
+        successRate: "87%"
+      }
+    };
+
+    const dataStr = JSON.stringify(dashboardData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export as CSV
+  const exportToCSV = () => {
+    const csvContent = [
+      'DASHBOARD REPORT',
+      `Export Date: ${new Date().toLocaleDateString()}`,
+      `Time Range: ${selectedTimeRange}`,
+      `Total Projects: ${ProjectLength}`,
+      `Total Issues: ${IssueLength}`,
+      '',
+      'PROJECTS',
+      'Project Name,Status,Progress',
+      ...ProjectValue.map(project => 
+        `${project.name},Active,${Math.floor(Math.random() * 40 + 40)}%`
+      ),
+      '',
+      'ISSUES BREAKDOWN',
+      'Issue Type,Count',
+      ...IssueValue.map(issue => `${issue.type},${issue.count}`),
+      '',
+      'PERFORMANCE METRICS',
+      'Metric,Value',
+      'Resolution Time,2.4 days',
+      'Team Productivity,94%',
+      'Success Rate,87%'
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Handle export selection
+  const handleExport = (format:any) => {
+    switch (format) {
+     
+      case 'csv':
+        exportToCSV();
+        break;
+      default:
+        exportToJSON();
+    }
+    setShowExportOptions(false);
+  };
 
   // Helper functions for colors and gradients
   function getTypeColor(type:any, index:any) {
@@ -179,10 +270,20 @@ const page = () => {
                   <RefreshCw size={18} className="group-hover:rotate-180 transition-transform duration-500" />
                   Refresh
                 </button>
-                <button className="flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105">
-                  <Download size={18} />
-                  Export
-                </button>
+                
+                {/* 🔥 REPLACE YOUR EXPORT BUTTON WITH THIS */}
+                <div className="relative">
+                  <button 
+                    onClick={() =>  handleExport('csv')}
+                    className="flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105"
+                  >
+                    <Download size={18} />
+                    Export As CSV 
+                  </button>
+                  
+                   
+                </div> 
+                
               </div>
             </div>
           </div>
