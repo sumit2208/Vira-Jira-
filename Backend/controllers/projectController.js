@@ -1,4 +1,4 @@
-const Project = require("../models/project");
+const Project = require("../models/project"); 
 const emailService = require("../services/emailService");
 
 
@@ -17,6 +17,9 @@ const getProjectsForUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
 
 
 // Add a member to a project
@@ -111,4 +114,4 @@ const DeleteProjectById = async (req, res) => {
 
 
 
-module.exports = { createProject, allProject, ProjectById, DeleteProjectById, addMemberToProject, getProjectsForUser };
+module.exports = { createProject, allProject, ProjectById, DeleteProjectById, addMemberToProject, getProjectsForUser};

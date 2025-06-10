@@ -44,7 +44,17 @@ const GetIssueByProject = async (req,res)=>{
   }
 };
 
+const getIssueForUser = async (req,res)=>{
+    try{
+        const {ProjectName} = req.params;
+
+        const issueUser = await issue.find({project:ProjectName})
+        res.status(200).json(issueUser)
+
+    }catch(error){
+        res.status(500).json({ error: error.message });
+    }
+}
 
 
-
-module.exports = { createIssue, getIssues, DeleteIssue , GetIssueByProject };
+module.exports = { createIssue, getIssues, DeleteIssue , GetIssueByProject ,getIssueForUser};

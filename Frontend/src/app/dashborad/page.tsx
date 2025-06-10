@@ -23,8 +23,10 @@ import {
   Zap,
   Star,
 } from "lucide-react";
-import { useGetProject } from "@/hook/projecthook";
+import { useGetProject , useGetUserProjects } from "@/hook/projecthook";
 import { useGetIssues } from "../../hook/issuehook";
+import { useUser } from "@clerk/nextjs";
+
 
 const page = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState("Last 30 days");
@@ -32,16 +34,20 @@ const page = () => {
   // 🔥 ADD THIS: State for export dropdown
   const [showExportOptions, setShowExportOptions] = useState(false);
 
+  const { user } = useUser();
+  const email = user?.primaryEmailAddress?.emailAddress;
+
   const { data: Issue, isLoading: IssueLoading, isError } = useGetIssues();
   const { data: Project, isLoading: ProjectLoading } = useGetProject();
+  const {data:UserData , isLoading:UserLoading} = useGetUserProjects(email)
 
-  const ProjectValue = Project || [];
-  const ProjectLength = Project?.length || 0;
+  const ProjectValue = UserData || [];
+  const ProjectLength = UserData?.length || 0;
 
   // Get counts for each type
   const issueTypeCount = {};
 
-  Issue?.forEach((issue) => {
+  Issue?.forEach((issue:any) => {
     // @ts-ignore
     issueTypeCount[issue.type] = (issueTypeCount[issue.type] || 0) + 1;
   });
@@ -67,43 +73,7 @@ const page = () => {
 
   // 🔥 ADD THESE EXPORT FUNCTIONS HERE (after your existing variables)
   
-  // Export as JSON
-  const exportToJSON = () => {
-    const dashboardData = {
-      metadata: {
-        exportDate: new Date().toISOString(),
-        timeRange: selectedTimeRange,
-        totalProjects: ProjectLength,
-        totalIssues: IssueLength,
-      },
-      projects: ProjectValue.map(project => ({
-        name: project.name,
-        status: "Active",
-        progress: Math.floor(Math.random() * 40 + 40) + "%"
-      })),
-      issues: {
-        breakdown: IssueValue,
-        total: IssueLength,
-      },
-      metrics: {
-        resolutionTime: "2.4 days",
-        teamProductivity: "94%",
-        successRate: "87%"
-      }
-    };
-
-    const dataStr = JSON.stringify(dashboardData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+ 
 
   // Export as CSV
   const exportToCSV = () => {
@@ -116,7 +86,7 @@ const page = () => {
       '',
       'PROJECTS',
       'Project Name,Status,Progress',
-      ...ProjectValue.map(project => 
+      ...ProjectValue.map((project:any) => 
         `${project.name},Active,${Math.floor(Math.random() * 40 + 40)}%`
       ),
       '',
@@ -149,9 +119,7 @@ const page = () => {
      
       case 'csv':
         exportToCSV();
-        break;
-      default:
-        exportToJSON();
+        break; 
     }
     setShowExportOptions(false);
   };
@@ -352,7 +320,7 @@ const page = () => {
             </div>
             <div className="space-y-6">
               {ProjectValue.length > 0 ? (
-                ProjectValue.map((project, index) => (
+                ProjectValue.map((project:any, index:any) => (
                   <div key={index} className="space-y-3 group">
                     <div className="flex justify-between items-center">
                       <span className="text-base font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">

@@ -99,3 +99,27 @@ export const useInviteMember = () => {
         },
     });
 };
+
+
+
+
+const fetchUserProjects = async (email:any) => {
+  if (!email) {
+    throw new Error("Email is required to fetch projects");
+  }
+
+  const response = await axios.get("http://localhost:5000/api/project/user-projects", {
+    params: { email },
+  });
+
+  return response.data;
+};
+
+// Custom hook to get user projects
+export const useGetUserProjects = (email:any) => {
+  return useQuery({
+    queryKey: ["userProjects", email], // Cache key, refetches when email changes
+    queryFn: () => fetchUserProjects(email),
+    enabled: !!email, // Only fetch if email exists 
+  });
+};
