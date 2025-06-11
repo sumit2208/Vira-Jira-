@@ -6,5 +6,6 @@ router.post("/create", createIssue);
 router.get("/get", getIssues);
 router.delete("/delete/:id",DeleteIssue)
 router.get("/projectissue/:ProjectName",GetIssueByProject) 
+router.get("/user-issue",getIssueForUser)
 
 module.exports = router; 

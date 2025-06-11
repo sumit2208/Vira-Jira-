@@ -24,7 +24,7 @@ import {
   Star,
 } from "lucide-react";
 import { useGetProject , useGetUserProjects } from "@/hook/projecthook";
-import { useGetIssues } from "../../hook/issuehook";
+import { useGetIssues ,useGetUserIssue} from "../../hook/issuehook";
 import { useUser } from "@clerk/nextjs";
 
 
@@ -40,6 +40,7 @@ const page = () => {
   const { data: Issue, isLoading: IssueLoading, isError } = useGetIssues();
   const { data: Project, isLoading: ProjectLoading } = useGetProject();
   const {data:UserData , isLoading:UserLoading} = useGetUserProjects(email)
+  const {data:UserDataIssue , isLoading:UserLoadings} = useGetUserIssue(email)
 
   const ProjectValue = UserData || [];
   const ProjectLength = UserData?.length || 0;
@@ -47,7 +48,7 @@ const page = () => {
   // Get counts for each type
   const issueTypeCount = {};
 
-  Issue?.forEach((issue:any) => {
+  UserDataIssue?.forEach((issue:any) => {
     // @ts-ignore
     issueTypeCount[issue.type] = (issueTypeCount[issue.type] || 0) + 1;
   });
@@ -62,7 +63,7 @@ const page = () => {
   }));
 
   // Total number of issues
-  const IssueLength = Issue?.length || 0;
+  const IssueLength = UserDataIssue?.length || 0;
 
   const timeRanges = [
     "Last 7 days",

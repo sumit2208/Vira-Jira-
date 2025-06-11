@@ -9,6 +9,9 @@ export interface Issue {
   priority: "High" | "Medium" | "Low";
   assignee: string;
   project:String,
+   members: {
+        email: string;
+    }[];
   type: "bug" | "code" | "doc";
   description?:String
   date?:Date
@@ -71,3 +74,24 @@ export const useGetIssuesByProject = (projectName:string) => {
     enabled: !!projectName, // only run when projectName is not null
   });
 };
+
+
+
+const FetchUserissue = async  (email:any) =>{
+  if(!email){
+        throw new Error("Email is required to fetch projects");
+  }
+  const response = await axios.get("http://localhost:5000/api/issues/user-issue" ,{
+    params :{email}
+  });
+
+  return response.data
+}
+
+export const useGetUserIssue = (email:any)=>{
+  return useQuery({
+ queryKey: ["userIssue", email], // Cache key, refetches when email changes
+    queryFn: () => FetchUserissue(email),
+    enabled: !!email, // Only fetch if email exists   
+    })
+}

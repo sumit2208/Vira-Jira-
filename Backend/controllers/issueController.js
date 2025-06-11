@@ -44,17 +44,21 @@ const GetIssueByProject = async (req,res)=>{
   }
 };
 
-const getIssueForUser = async (req,res)=>{
-    try{
-        const {ProjectName} = req.params;
+const getIssueForUser = async (req, res) => {
+  try {
+    const userEmail = req.query.email;
 
-        const issueUser = await issue.find({project:ProjectName})
-        res.status(200).json(issueUser)
-
-    }catch(error){
-        res.status(500).json({ error: error.message });
+    if (!userEmail) {
+      return res.status(400).json({ message: "User email is required" });
     }
-}
+
+    const issues = await issue.find({ members: { $elemMatch: { email: userEmail } } });
+    res.status(200).json(issues);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 
 module.exports = { createIssue, getIssues, DeleteIssue , GetIssueByProject ,getIssueForUser};

@@ -36,6 +36,9 @@ interface Issue {
   description: string;
   status: "todo" | "in-progress" | "review" | "done";
   priority: "low" | "medium" | "high";
+  members: {
+        email: string;
+    }[];
   assignee?: string;
   createdAt: string;
 }
